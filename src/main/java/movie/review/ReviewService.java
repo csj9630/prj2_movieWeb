@@ -60,7 +60,7 @@ public class ReviewService {
 		if (scoreAverage == 0) {
 			return 0;
 		}
-		scoreAverage = Math.ceil(scoreAverage / list.size() *1000) / 1000.0;
+		scoreAverage = Math.round((double) scoreAverage / list.size() * 10) / 10.0;
 		return scoreAverage;
 	}// getScoreAverage
 
