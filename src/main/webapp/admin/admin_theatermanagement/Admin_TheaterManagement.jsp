@@ -1,0 +1,407 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>2GV Admin - 상영관 관리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* [1. 초기화 & 공통] - 이전과 동일 */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f5f6fa;
+            color: #333;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        button { border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
+        input, select { font-family: 'Noto Sans KR', sans-serif; }
+
+        /* [2. 사이드바] - 이전과 동일 */
+        .sidebar {
+            width: 260px;
+            background-color: #1e1e2d;
+            color: #a2a3b7;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        .logo-area {
+            height: 80px;
+            display: flex; align-items: center; justify-content: center;
+            background-color: #1b1b28;
+            border-bottom: 1px solid #2d2d3f;
+        }
+        .logo-area img { height: 45px; object-fit: contain; display: block; }
+        .menu-list { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .menu-category {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            color: #5e6278; padding: 10px 25px; margin-top: 15px;
+        }
+        .menu-category:first-child { margin-top: 0; }
+        .menu-link {
+            display: flex; align-items: center;
+            padding: 12px 25px;
+            color: #a2a3b7;
+            font-size: 14px; font-weight: 500;
+            transition: 0.2s; border-left: 3px solid transparent;
+        }
+        .menu-link:hover, .menu-link.active {
+            background-color: #2b2b40; color: #fff; border-left-color: #503396;
+        }
+        .menu-icon { width: 25px; font-size: 16px; text-align: center; margin-right: 10px; }
+        .sidebar-footer {
+            padding: 20px; border-top: 1px solid #2d2d3f;
+            display: flex; align-items: center; gap: 12px; background-color: #1e1e2d;
+        }
+        .admin-avatar {
+            width: 40px; height: 40px; background-color: #503396;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            color: #fff; font-weight: bold; font-size: 14px;
+        }
+        .admin-info h4 { font-size: 14px; color: #fff; font-weight: 500; margin-bottom: 2px; }
+        .admin-info p { font-size: 12px; color: #727589; }
+
+        /* [3. 메인 컨텐츠] - 이전과 동일 */
+        .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        
+        .top-header {
+            height: 80px; 
+            background-color: #ffffff; 
+            border-bottom: 1px solid #e1e1e1;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            padding: 0 30px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        }
+
+        .header-left-title h2 {
+            font-size: 24px; font-weight: 800; color: #1e1e2d;
+            margin-bottom: 4px; letter-spacing: -0.5px;
+        }
+        .header-left-title p {
+            font-size: 13px; color: #888; font-weight: 500;
+        }
+
+        .header-right { display: flex; align-items: center; gap: 20px; margin-left: 20px; }
+        .logout-btn {
+            padding: 8px 16px; border: 1px solid #e1e1e1; background-color: #fff;
+            border-radius: 6px; font-size: 12px; font-weight: 600; color: #5e6278; transition: 0.2s;
+        }
+        .logout-btn:hover { background-color: #f9f9f9; border-color: #d1d1d1; color: #333; }
+
+        /* [4. 본문 컨텐츠] */
+        .content-wrapper { flex: 1; padding: 40px 30px; overflow-y: auto; }
+
+        /* 테이블 영역 */
+        .table-container {
+            background: #fff; border-radius: 12px; padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+        }
+        .table-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;
+        }
+        .total-count { font-size: 14px; color: #555; font-weight: 600; }
+        .total-count span { color: #503396; }
+
+        /* 하단 버튼 그룹 (위치 변경됨: 테이블 아래로) */
+        .bottom-actions {
+            display: flex;
+            justify-content: flex-end; /* 오른쪽 정렬 */
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-btn-lg {
+            padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 700;
+            border: 1px solid transparent; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        
+        /* 등록/수정 버튼 (보라색) */
+        .btn-register {
+            background-color: #503396; color: #fff;
+        }
+        .btn-register:hover { background-color: #3e257a; }
+
+        /* 비활성화 버튼 (빨간색) */
+        .btn-disable {
+            background-color: #fdedec; color: #e74c3c; border-color: #fadbd8;
+        }
+        .btn-disable:hover { background-color: #fceae9; }
+
+
+        /* 테이블 스타일 */
+        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        th {
+            background-color: #f9f9f9; color: #5e6278; font-weight: 600; text-align: center;
+            padding: 15px 25px; border-bottom: 1px solid #eee;
+        }
+        td {
+            padding: 15px 25px; border-bottom: 1px solid #f5f5f5; color: #3f4254;
+            text-align: center; vertical-align: middle; transition: background-color 0.2s;
+        }
+        tbody tr { cursor: pointer; }
+        tbody tr:hover { background-color: #f8f9fa; }
+
+        /* 상태 뱃지 */
+        .status-active { color: #1bc5bd; font-weight: 700; background: #e8fff3; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+        .status-inactive { color: #999; font-weight: 700; background: #f1f1f1; padding: 4px 10px; border-radius: 4px; font-size: 12px; }
+
+        .pagination { display: flex; justify-content: center; margin-top: 30px; gap: 5px; }
+        .page-link {
+            width: 35px; height: 35px; display: flex; justify-content: center; align-items: center;
+            border: 1px solid #eee; border-radius: 6px; font-size: 13px; color: #555;
+            transition: 0.2s;
+        }
+        .page-link:hover { background-color: #f5f5f5; border-color: #ddd; }
+        .page-link.active { background-color: #503396; color: #fff; border-color: #503396; font-weight: 700; }
+
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo-area">
+            <a href="../admin_dashboard/Admin_Dashboard.jsp"><img src="../../resources/img/2GV_LOGO_empty.png"></a>
+        </div>
+        <div class="menu-list">
+            <div class="menu-category">MAIN</div>
+            <ul><li><a href="../admin_dashboard/Admin_Dashboard.jsp" class="menu-link"><i class="fa-solid fa-chart-pie menu-icon"></i><span>메인 페이지</span></a></li></ul>
+            <div class="menu-category">RESOURCE</div>
+            <ul>
+                <li><a href="../admin_usermanagement/Admin_UserManagement.jsp" class="menu-link"><i class="fa-solid fa-users menu-icon"></i><span>회원 관리</span></a></li>
+                <li><a href="../admin_theatermanagement/Admin_TheaterManagement.jsp" class="menu-link active"><i class="fa-solid fa-couch menu-icon"></i><span>상영관 관리</span></a></li>
+                <li><a href="../admin_moviemanagement/Admin_MovieList.jsp" class="menu-link"><i class="fa-solid fa-film menu-icon"></i><span>영화 관리</span></a></li>
+            </ul>
+            <div class="menu-category">SERVICE</div>
+            <ul>
+                <li><a href="../admin_reservationmanagement/Admin_ReservationList.jsp" class="menu-link"><i class="fa-solid fa-ticket menu-icon"></i><span>예매 관리</span></a></li>
+                <li><a href="../admin_schedulemanagement/Admin_ScreeningList.jsp" class="menu-link"><i class="fa-solid fa-calendar-days menu-icon"></i><span>상영 스케줄 관리</span></a></li>
+            </ul>
+            <div class="menu-category">BOARD</div>
+            <ul>
+                <li><a href="../admin_reviewmanagement/Admin_ReviewList.jsp" class="menu-link"><i class="fa-solid fa-comments menu-icon"></i><span>리뷰 관리</span></a></li>
+                <li><a href="../admin_noticemanagement/Admin_NoticeList.jsp" class="menu-link"><i class="fa-solid fa-bullhorn menu-icon"></i><span>공지 사항</span></a></li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="admin-avatar">AD</div>
+            <div class="admin-info"><h4>최고관리자</h4><p>Super Admin</p></div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        
+        <header class="top-header">
+            <div class="header-left-title">
+                <h2>상영관 관리</h2>
+                <p>등록된 상영관의 목록을 조회하고 관리합니다.</p>
+            </div>
+            <div class="header-right">
+                <button class="logout-btn" onclick="location.href='../admin_login/Admin_Login.jsp'">로그아웃</button>
+            </div>
+        </header>
+
+        <div class="content-wrapper">
+
+            <div class="table-container">
+                <div class="table-header">
+                    <p class="total-count">총 <span>15</span>개의 상영관이 검색되었습니다.</p>
+                </div>
+
+                <table>
+                    <colgroup>
+                        <col width="5%">  <col width="20%"> <col width="25%"> <col width="15%"> <col width="25%"> <col width="10%"> </colgroup>
+                    <thead>
+                        <tr>
+                            <th>선택</th>
+                            <th>상영관 ID</th>
+                            <th>상영관 이름</th>
+                            <th>총 좌석 수</th>
+                            <th>사운드 시스템</th>
+                            <th>사용 가능 여부</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema1" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema1</td><td>1상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema2" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema2</td><td>2상영관</td><td>100석</td><td>Dolby Digital 7.1</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema3" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema3</td><td>3상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema4" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema4</td><td>4상영관</td><td>100석</td><td>DTS Digital Surround</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema5" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema5</td><td>5상영관</td><td>100석</td><td>Dolby Digital 7.1</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema6" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema6</td><td>6상영관</td><td>100석</td><td>Meyer Sound</td>
+                            <td><span class="status-inactive">미사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema7" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema7</td><td>7상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema8" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema8</td><td>8상영관</td><td>100석</td><td>Dolby Digital 7.1</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema9" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema9</td><td>9상영관</td><td>100석</td><td>DTS Digital Surround</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema10" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema10</td><td>10상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema11" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema11</td><td>11상영관</td><td>100석</td><td>Meyer Sound</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema12" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema12</td><td>12상영관</td><td>100석</td><td>Dolby Digital 7.1</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema13" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema13</td><td>13상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema14" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema14</td><td>14상영관</td><td>100석</td><td>DTS Digital Surround</td>
+                            <td><span class="status-inactive">미사용중</span></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" class="row-check" value="cinema15" onclick="checkOnlyOne(this)"></td>
+                            <td>cinema15</td><td>15상영관</td><td>100석</td><td>Dolby Atmos</td>
+                            <td><span class="status-active">사용중</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="bottom-actions">
+                    <button class="action-btn-lg btn-register" onclick="goRegisterOrEdit()">
+                        <i class="fa-solid fa-pen-to-square"></i> 등록/수정
+                    </button>
+                    <button class="action-btn-lg btn-disable" onclick="deactivateTheater()">
+                        <i class="fa-solid fa-ban"></i> 비활성화
+                    </button>
+                </div>
+
+                <div class="pagination">
+                    <a href="#" class="page-link"><i class="fa-solid fa-chevron-left"></i></a>
+                    <a href="#" class="page-link active">1</a>
+                    <a href="#" class="page-link"><i class="fa-solid fa-chevron-right"></i></a>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // [1] 체크박스 하나만 선택되게 하기 (라디오 버튼 효과)
+        function checkOnlyOne(element) {
+            const checkboxes = document.getElementsByName("theaterCheck");
+            // 다른 체크박스가 있다면 해제하는 로직을 추가하거나, 
+            // 여기서는 class="row-check"로 잡아서 처리
+            const allChecks = document.querySelectorAll('.row-check');
+            
+            allChecks.forEach((cb) => {
+                cb.checked = false; // 일단 다 끔
+            });
+            
+            element.checked = true; // 클릭한 것만 켬
+        }
+
+     // [2] 등록/수정 버튼 클릭 시 (수정된 로직)
+        function goRegisterOrEdit() {
+            const selected = document.querySelector('.row-check:checked');
+            
+            if (selected) {
+                // 선택된 행(tr) 가져오기
+                const tr = selected.closest('tr');
+                
+                // 각 컬럼의 텍스트 가져오기 (순서대로 td[1], td[2]...)
+                const id = tr.children[1].innerText;     // cinema1
+                const name = tr.children[2].innerText;   // 1상영관
+                const seat = tr.children[3].innerText;   // 100석
+                const sound = tr.children[4].innerText;  // Dolby Atmos
+                const status = tr.children[5].innerText; // 사용중
+
+                // 데이터를 URL 파라미터로 묶어서 전달 (인코딩 필수)
+                const params = "id=" + encodeURIComponent(id) + 
+                               "&name=" + encodeURIComponent(name) +
+                               "&seat=" + encodeURIComponent(seat) +
+                               "&sound=" + encodeURIComponent(sound) +
+                               "&status=" + encodeURIComponent(status);
+
+                // 페이지 이동
+                location.href = "Admin_TheaterRegister.jsp?" + params;
+            } else {
+                // [수정됨] 선택 안 하면 경고창만 띄움 (신규등록 이동 X)
+                alert("수정할 상영관을 선택해주세요.");
+            }
+        }
+
+        // [3] 비활성화 버튼 클릭 시
+        function deactivateTheater() {
+            const selected = document.querySelector('.row-check:checked');
+            
+            if (!selected) {
+                alert("비활성화할 상영관을 선택해주세요.");
+                return;
+            }
+
+            const theaterName = selected.parentElement.nextElementSibling.nextElementSibling.innerText; // 1상영관
+            const statusCell = selected.parentElement.parentElement.querySelector('span'); // 상태 span 태그
+
+            if (confirm(theaterName + "을(를) 비활성화 하시겠습니까?")) {
+                // UI상에서 상태 변경 (실제로는 DB 업데이트 필요)
+                statusCell.className = "status-inactive";
+                statusCell.innerText = "미사용중";
+                alert("처리되었습니다.");
+            }
+        }
+
+        // 페이지네이션 링크 클릭 방지
+        const pageLinks = document.querySelectorAll('.page-link');
+        pageLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+            });
+        });
+    </script>
+
+</body>
+</html>

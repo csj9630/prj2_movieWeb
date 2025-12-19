@@ -1,0 +1,654 @@
+/*==============업데이트 내용============================*/
+/*
+2025-12-12 : 이미지 파일명을 mc001_still_001.jpg로 변경
+2025-12-11 : movie, trailer, MOVIE_IMAGE 가데이터를 insert all로 수정 및 데이터  추가
+
+2025-12-11 : PK키 포맷 변경 완료 (1자리 -> 3자리 패딩)
+             ex) dc1 -> dc001, tn1 -> tn001, scc1 -> scc001 등
+2025-12-10 : movie, trailer, MOVIE_IMAGE 테이블 구조 및 가데이터 수정
+2025-12-10 : F5로 실행 잘되게 제미나이 찬스로 수정함.
+*/
+
+/* ============================================== */
+/* 초기화 (테이블 삭제)               */
+/* ============================================== */
+DROP TABLE ANNOUNCE CASCADE CONSTRAINTS;
+DROP TABLE MOVIE_IMAGE CASCADE CONSTRAINTS;
+DROP TABLE TRAILER CASCADE CONSTRAINTS;
+DROP TABLE REVIEW CASCADE CONSTRAINTS;
+DROP TABLE PAYMENT CASCADE CONSTRAINTS;
+DROP TABLE SEAT_BOOK CASCADE CONSTRAINTS;
+DROP TABLE BOOK CASCADE CONSTRAINTS;
+DROP TABLE SCREEN_INFO CASCADE CONSTRAINTS;
+DROP TABLE CAST CASCADE CONSTRAINTS;
+DROP TABLE MOVIE_DIRECTOR CASCADE CONSTRAINTS;
+DROP TABLE SEAT CASCADE CONSTRAINTS;
+DROP TABLE THEATHER_INFO CASCADE CONSTRAINTS;
+DROP TABLE SOUND CASCADE CONSTRAINTS;
+DROP TABLE BOOK_RATE CASCADE CONSTRAINTS;
+DROP TABLE MOVIE CASCADE CONSTRAINTS;
+DROP TABLE CINEMA_INFO CASCADE CONSTRAINTS;
+DROP TABLE ACTOR CASCADE CONSTRAINTS;
+DROP TABLE DIRECTOR CASCADE CONSTRAINTS;
+DROP TABLE DISCOUNT CASCADE CONSTRAINTS;
+DROP TABLE ADMIN CASCADE CONSTRAINTS;
+DROP TABLE USERS CASCADE CONSTRAINTS;
+
+/* ============================================== */
+/* 테이블 생성 (CREATE)              */
+/* ============================================== */
+
+/* 1. 유저 */
+CREATE TABLE USERS (
+    users_id VARCHAR2(30) NOT NULL PRIMARY KEY,
+    users_pass VARCHAR2(30) NOT NULL,
+    email VARCHAR2(60) NOT NULL,
+    users_name VARCHAR2(40) NOT NULL,
+    birth DATE NOT NULL,
+    gender CHAR(10) NOT NULL,
+    users_image VARCHAR2(100) NOT NULL,
+    recent_login DATE NOT NULL,
+    join_date DATE NOT NULL,
+    active CHAR(10) NOT NULL,
+    phone_num VARCHAR2(30) NOT NULL
+);
+
+/* 2. 관리자 */
+CREATE TABLE ADMIN (
+    admin_id VARCHAR2(40) NOT NULL PRIMARY KEY,
+    admin_pass VARCHAR2(40) NOT NULL,
+    create_date DATE NOT NULL
+);
+
+/* 3. 할인 */
+CREATE TABLE DISCOUNT (
+    discount_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    discount_type VARCHAR2(30) NOT NULL,
+    discount_rate NUMBER NOT NULL,
+    discount_people VARCHAR2(30) NOT NULL
+);
+
+/* 4. 감독 */
+CREATE TABLE DIRECTOR (
+    director_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    director_name VARCHAR2(40) NOT NULL
+);
+
+/* 5. 배우 */
+CREATE TABLE ACTOR (
+    actor_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    actor_name VARCHAR2(50) NOT NULL
+);
+
+/* 6. 영화관 정보 */
+CREATE TABLE CINEMA_INFO (
+    cinema_num VARCHAR2(30) NOT NULL PRIMARY KEY,
+    cinema_name VARCHAR2(30) NOT NULL,
+    cinema_location VARCHAR2(60) NOT NULL
+);
+
+/* 7. 영화 */
+CREATE TABLE MOVIE (
+    movie_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    movie_name VARCHAR2(90) NOT NULL,
+    movie_genre VARCHAR2(50) NOT NULL,
+    running_time VARCHAR2(30) NOT NULL,
+    movie_grade VARCHAR2(30) NOT NULL,
+    release_date VARCHAR2(30) NOT NULL,
+    intro VARCHAR2(999) NOT NULL,
+    main_image VARCHAR2(60) NOT NULL,
+    bg_image VARCHAR2(60) NOT NULL,
+    daily_audience VARCHAR2(30) NOT NULL,
+    total_audience VARCHAR2(30) NOT NULL,
+    movie_delete CHAR(10) NOT NULL,
+    showing VARCHAR2(30) NOT NULL
+);
+
+/* 8. 예매율 */
+CREATE TABLE BOOK_RATE(
+    bookrate_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    book_rate NUMBER NOT NULL,
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_BOOK_RATE_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 9. 사운드 시스템 */
+CREATE TABLE SOUND (
+    sound_code VARCHAR2(20) NOT NULL PRIMARY KEY,
+    sound_name VARCHAR2(60) NOT NULL
+);
+
+/* 10. 상영관 정보 */
+CREATE TABLE THEATHER_INFO (
+    theather_num VARCHAR2(20) NOT NULL PRIMARY KEY,
+    theather_name VARCHAR2(30) NOT NULL,
+    total_seat NUMBER NOT NULL,
+    availability CHAR(10) NOT NULL,
+    cinema_num VARCHAR2(30) NOT NULL CONSTRAINT FK_THEATHER_INFO_CINEMA_NUM REFERENCES CINEMA_INFO(CINEMA_NUM),
+    sound_code VARCHAR2(20) NOT NULL CONSTRAINT FK_THEATHER_INFO_SOUND_CODE REFERENCES SOUND(SOUND_CODE)
+);
+
+/* 11. 좌석 */
+CREATE TABLE SEAT (
+    seat_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    seat_row VARCHAR2(30) NOT NULL,
+    seat_col VARCHAR2(30) NOT NULL,
+    available_seat VARCHAR2(20) NOT NULL,
+    theather_num VARCHAR2(20) NOT NULL CONSTRAINT FK_SEAT_THEATHER_NUM REFERENCES THEATHER_INFO(THEATHER_NUM)
+);
+
+/* 12. 영화 감독 */
+CREATE TABLE MOVIE_DIRECTOR (
+    director_code VARCHAR2(30) NOT NULL CONSTRAINT FK_MOVIE_DIRECTOR_DIRECTOR_CODE REFERENCES DIRECTOR(DIRECTOR_CODE),
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_MOVIE_DIRECTOR_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 13. 출연진 */
+CREATE TABLE CAST (
+    actor_code VARCHAR2(30) NOT NULL CONSTRAINT FK_CAST_ACTOR_CODE REFERENCES ACTOR(ACTOR_CODE),
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_CAST_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 14. 상영 정보 */
+CREATE TABLE SCREEN_INFO (
+    screen_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    screen_open DATE NOT NULL,
+    screen_end DATE NOT NULL,
+    screen_price NUMBER NOT NULL,
+    screen_date DATE NOT NULL,
+    screen_delete CHAR(10) NOT NULL,
+    screen_showing CHAR(10) NOT NULL,
+    theather_num VARCHAR2(20) NOT NULL CONSTRAINT FK_SCREEN_INFO_THEATHER_NUM REFERENCES THEATHER_INFO(THEATHER_NUM),
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_SCREEN_INFO_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 15. 예매 */
+CREATE TABLE BOOK (
+    book_num VARCHAR2(30) NOT NULL PRIMARY KEY,
+    book_time VARCHAR2(30) NOT NULL,
+    book_state VARCHAR2(30) NOT NULL,
+    book_cancel DATE,
+    total_book NUMBER NOT NULL,
+    screen_code VARCHAR2(30) NOT NULL CONSTRAINT FK_BOOK_SCREEN_CODE REFERENCES SCREEN_INFO(SCREEN_CODE),
+    users_id VARCHAR2(30) NOT NULL CONSTRAINT FK_BOOK_USERS_ID REFERENCES USERS(USERS_ID)
+);
+
+/* 16. 예매 좌석 */
+CREATE TABLE SEAT_BOOK (
+    seat_book_code VARCHAR2(30) NOT NULL,
+    seat_code VARCHAR2(30) NOT NULL,
+    screen_code VARCHAR2(30) NOT NULL CONSTRAINT FK_SEAT_BOOK_SCREEN_CODE REFERENCES SCREEN_INFO(SCREEN_CODE),
+    book_num VARCHAR2(30) NOT NULL CONSTRAINT FK_SEAT_BOOK_BOOK_NUM REFERENCES BOOK(BOOK_NUM),
+    discount_code VARCHAR2(30) NOT NULL CONSTRAINT FK_SEAT_BOOK_DISCOUNT_CODE REFERENCES DISCOUNT(DISCOUNT_CODE),
+    CONSTRAINT PK_SEAT_BOOK PRIMARY KEY (seat_book_code)
+);
+
+/* 17. 결제 */
+CREATE TABLE PAYMENT (
+    payment_code VARCHAR2(30) NOT NULL PRIMARY KEY,
+    payment_price NUMBER NOT NULL,
+    payment_method VARCHAR2(30) NOT NULL,
+    payment_time DATE NOT NULL,
+    payment_state VARCHAR2(30) NOT NULL,
+    book_num VARCHAR2(30) NOT NULL CONSTRAINT FK_PAYMENT_BOOK_NUM REFERENCES BOOK(BOOK_NUM)
+);
+
+/* 18. 리뷰 */
+CREATE TABLE REVIEW (
+    review_num VARCHAR2(30) NOT NULL,
+    review_content VARCHAR2(3000) NOT NULL,
+    review_score NUMBER NOT NULL,
+    review_date DATE NOT NULL,
+    book_num VARCHAR2(30) NOT NULL CONSTRAINT FK_REVIEW_BOOK_NUM REFERENCES BOOK(BOOK_NUM),
+    users_id VARCHAR2(100) NOT NULL CONSTRAINT FK_REVIEW_USERS_ID REFERENCES USERS(USERS_ID)
+);
+
+/* 19. 트레일러 */
+CREATE TABLE TRAILER (
+    trailer_code VARCHAR2(20) NOT NULL PRIMARY KEY,
+    url_path VARCHAR2(300) NOT NULL,
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_MOVIE_TRAILER_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 20. 이미지 */
+CREATE TABLE MOVIE_IMAGE (
+    img_code VARCHAR2(20) NOT NULL PRIMARY KEY,
+    img_path VARCHAR2(300) NOT NULL,
+    movie_code VARCHAR2(30) NOT NULL CONSTRAINT FK_MOVIE_IMAGE_MOVIE_CODE REFERENCES MOVIE(MOVIE_CODE)
+);
+
+/* 21. 공지사항 */
+CREATE TABLE ANNOUNCE (
+    announce_num NUMBER NOT NULL PRIMARY KEY,
+    announce_name VARCHAR2(1000) NOT NULL,
+    announce_content VARCHAR2(3000) NOT NULL,
+    announce_views NUMBER NOT NULL,
+    announce_date DATE NOT NULL,
+    ADMIN_id VARCHAR2(100) NOT NULL CONSTRAINT FK_ANNOUNCE_ADMIN_ID REFERENCES ADMIN(ADMIN_ID)
+);
+
+/* ============================================== */
+/* 데이터 삽입 (INSERT)              */
+/* ============================================== */
+
+/* 1. 유저 */
+INSERT INTO USERS(USERS_ID, USERS_PASS, EMAIL, USERS_NAME, BIRTH, GENDER, USERS_IMAGE, RECENT_LOGIN, JOIN_DATE, ACTIVE, PHONE_NUM)
+VALUES('test1', '1234', 'test@naver.com', '이정우', '2000-10-13','남자', 'default.jpg', SYSDATE, '2025-11-18', '비활성','010-1111-1111');
+
+INSERT INTO USERS(USERS_ID, USERS_PASS, EMAIL, USERS_NAME, BIRTH, GENDER, USERS_IMAGE, RECENT_LOGIN, JOIN_DATE, ACTIVE, PHONE_NUM)
+VALUES('test2', 'q1w2e3', 'qq@naver.com', '테스트', '1999-05-23','여자', 'default.jpg', SYSDATE, '2025-10-18', '활성','010-4554-1111');
+
+INSERT INTO USERS(USERS_ID, USERS_PASS, EMAIL, USERS_NAME, BIRTH, GENDER, USERS_IMAGE, RECENT_LOGIN, JOIN_DATE, ACTIVE, PHONE_NUM)
+VALUES('test3', '1', 'user@naver.com', '유저', '1991-10-13','남자', 'default.jpg', SYSDATE, '2023-11-18', '활성', '010-1234-2231');
+
+/* 2. 관리자 */
+INSERT INTO ADMIN(ADMIN_ID, ADMIN_PASS, CREATE_DATE) VALUES('admin','1234',SYSDATE);
+INSERT INTO ADMIN(ADMIN_ID, ADMIN_PASS, CREATE_DATE) VALUES('admin2','admin',SYSDATE);
+INSERT INTO ADMIN(ADMIN_ID, ADMIN_PASS, CREATE_DATE) VALUES('ad','1',SYSDATE);
+
+/* 3. 할인 (dc1 -> dc001) */
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc001','조조','0.5','청소년');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc002','조조','0.6','성인');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc003','조조','0.4','경로');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc004','일반','0.7','청소년');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc005','일반','1','성인');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc006','일반','0.6','경로');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc007','심야','0.6','청소년');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc008','심야','0.7','성인');
+INSERT INTO DISCOUNT(DISCOUNT_CODE, DISCOUNT_TYPE, DISCOUNT_RATE, DISCOUNT_PEOPLE) VALUES('dc009','심야','0.5','경로');
+
+/* 4. 감독 (dt1 -> dt001) */
+INSERT INTO DIRECTOR(DIRECTOR_CODE, DIRECTOR_NAME) VALUES('dt001','봉준호');
+INSERT INTO DIRECTOR(DIRECTOR_CODE, DIRECTOR_NAME) VALUES('dt002','헐리우드');
+INSERT INTO DIRECTOR(DIRECTOR_CODE, DIRECTOR_NAME) VALUES('dt003','박찬혹');
+
+/* 5. 배우 (at1 -> at001) */
+INSERT INTO ACTOR(ACTOR_CODE, ACTOR_NAME) VALUES('at001','송강호');
+INSERT INTO ACTOR(ACTOR_CODE, ACTOR_NAME) VALUES('at002','나미라');
+INSERT INTO ACTOR(ACTOR_CODE, ACTOR_NAME) VALUES('at003','덕화');
+
+/* 6. 영화관 정보 (cn1 -> cn001) */
+INSERT INTO CINEMA_INFO(CINEMA_NUM, CINEMA_NAME, CINEMA_LOCATION) VALUES ('cn001','쌍용시네마','H타워');
+
+/* 7. 영화 (mc001 유지) */
+INSERT INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc001','극장판 체인소맨 : 폭탄편','액션','120','15세 이용가', '2025-10-20',
+'압도적 배틀 액션이 스크린에서 폭발한다!  데블 헌터로 일하는 소년 ''덴지''는 조직의 배신으로 죽음에 내몰린 순간 전기톱 악마견 ''포치타''와의 계약으로 하나로 합쳐져  누구도 막을 수 없는 존재 ''체인소 맨''으로 다시 태어난다.  악마와 사냥꾼, 그리고 정체불명의 적들이 얽힌 잔혹한 전쟁 속에서  ''레제''라는 이름의 미스터리한 소녀가 ''덴지'' 앞에 나타나는데…  ''덴지''는 사랑이라는 감정에 이끌려 지금껏 가장 위험한 배틀에 몸을 던진다! ',
+'mc001_poster.jpg','mc001_bg.jpg','15000','3000000','F','상영중');
+
+INSERT INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc002','더 퍼스트 슬램덩크','스포츠','124','전체 이용가', '2025-01-04',
+'전국 제패를 꿈꾸는 북산고 농구부 5인방의 이야기를 그린 작품. 이번 극장판은 ''송태섭''을 중심으로 그의 과거와 현재가 교차되며 펼쳐지는 박진감 넘치는 경기를 담아냈다. 구판 애니메이션에서 미처 다루지 못한, 많은 팬들이 그토록 원했던 원작 최종 보스 산왕공고(산노)와의 인터하이 32강전을 영상화한 작품으로, 큰 틀에선 원작과 같으면서도 세부적으론 다른 연출과 스토리텔링을 사용한 게 돋보인다. ',
+'mc002_poster.jpg','mc002_bg.jpg','12000','4800000','F','상영중');
+
+INSERT INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc003','엘리멘탈','애니메이션','109','전체 이용가', '2025-06-14',
+'불, 물, 흙, 공기 4개의 원소들이 살고 있는 ''엘리멘트 시티''. 재치 있고 불 같은 성격의 ''앰버''는 낯설고 새로운 세상에서 우연히 유쾌하고 감성적이며 물 흐르듯 사는 ''웨이드''를 만나 특별한 우정을 쌓아간다. 한 불 원소 부부가 돛단배를 타고 안개에 뒤덮인 바다를 가르며 어딘가로 향하는 모습을 비추면서 영화가 시작된다. 그렇게 도착한 곳은 여러 원소들이 함께 어울려 사는 도시인 엘리멘트 시티. 짐을 챙기고 배에서 내린 부부는 입국을 위해 검문소로 향한다.',
+'mc003_poster.jpg','mc003_bg.jpg','8000','7200000','F','상영중');
+
+INSERT INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc004','엣지 오브 투모로우','액션/SF','113','12세 이용가', '2025-12-20',
+'외계 종족 ''미믹''의 침공으로 멸망 위기에 놓인 지구. 훈련 한번 받지않은 소심한 공보관 빌 케이지 소령(톰 크루즈)은 전투에 투입되자마자 외계인의 피를 뒤집어쓰고 사망한다. 그런데 눈을 뜨니 자신이 과거로 돌아와 같은 날을 반복하고 있다. 그는 반복되는 시간 속에서 전설적인 전사 리타 브라타스키(에밀리 블런트)를 만나 외계 종족을 이길 방법을 찾기 위해 끝없이 싸우고, 죽고, 다시 태어나는 지옥 같은 운명을 겪는다. 이 타임 루프를 멈추고 전쟁을 끝낼 수 있을까?',
+'mc004_poster.jpg','mc004_bg.jpg','5000','4699307','F','상영중');
+
+
+INSERT ALL
+-- 오펜하이머 (mc005) (따옴표 수정 완료)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc005','오펜하이머','드라마/역사','180','15세 이용가', '2023-08-15',
+'1940년대, 제2차 세계대전이 한창이던 시기. 천재 물리학자 J. 로버트 오펜하이머는 미 육군의 레슬리 그로브스 장군에게 발탁되어 극비리에 진행되는 ''맨해튼 프로젝트''의 총 책임자로 임명된다. 그는 인류의 미래를 건 핵무기 개발이라는 막중한 임무를 수행하며, 과학적 성취와 도덕적 딜레마 사이에서 고뇌한다. 그의 연구는 세상을 영원히 바꿀 결과를 초래하게 되고, 오펜하이머는 자신이 만든 창조물의 무게를 감당해야만 한다. 이 영화는 한 천재 과학자의 빛과 그림자를 심도 있게 조명하며, 원자 폭탄 개발 과정과 그 이후의 격변을 드라마틱하게 그려낸다.',
+'mc005_poster.jpg','mc005_bg.jpg','6000','3200000','F','상영중')
+
+-- 스즈메의 문단속 (mc006)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc006','스즈메의 문단속','애니메이션/판타지','121','12세 이용가', '2023-03-08',
+'규슈의 한적한 마을에 사는 17세 소녀 스즈메는 ''문을 찾는다''는 이상한 청년 소타를 만난다. 호기심에 그를 쫓아 산속 폐허에서 낡은 문을 발견하고, 문을 열자 재난을 부르는 ''미미즈''가 나타난다. 소타는 재난을 막기 위해 전국을 떠돌며 문을 ''닫는'' 사명을 지닌 ''토지시''였고, 실수로 그를 어린 의자로 변하게 만든 스즈메는 자신의 잘못을 되돌리고 미미즈로 인해 발생할 수 있는 재난을 막기 위해 소타와 함께 일본 전역의 폐허에 나타나는 재난의 문을 닫기 위한 여정을 시작한다. 두 사람은 이 특별하고 신비한 여행을 통해 성장과 인연의 의미를 깨닫게 된다.',
+'mc006_poster.jpg','mc006_bg.jpg','4500','5540000','F','상영중')
+
+-- 아바타 물의 길 (mc007)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc007','아바타 물의 길','SF/액션/어드벤처','192','12세 이용가', '2022-12-14',
+'제이크 설리와 네이티리가 가족을 이루고 평화로운 삶을 이어가던 판도라. 하지만 지구인들의 재침공으로 다시금 평화가 깨지고, 제이크는 가족을 지키기 위해 낯선 바다로 피신한다. 그곳에서 그는 신비로운 물의 부족 ''멧케이나''족과 조우하며 바다에서 살아가는 법과 그들의 문화를 배운다. 그러나 인간들의 위협은 계속되고, 제이크 가족은 낯선 환경과 새로운 삶의 방식에 적응하면서도 사랑하는 사람들을 지키기 위한 필사적인 사투를 벌이게 된다. 아름답고 광활한 수중 세계를 배경으로 펼쳐지는 이들의 서사는 가족의 의미와 자연과의 조화를 다시 한번 생각하게 한다.',
+'mc007_poster.jpg','mc007_bg.jpg','3000','10800000','F','상영중')
+
+-- 가디언즈 오브 갤럭시3 (mc008)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc008','가디언즈 오브 갤럭시3','액션/어드벤처/SF','150','12세 이용가', '2023-05-03',
+'사랑하는 이를 잃은 슬픔에 빠진 스타로드(피터 퀼)와 가디언즈 멤버들은 더 이상 평화로운 은둔 생활을 이어가지 못한다. 팀의 과거와 깊이 얽힌 새로운 위협이 등장하며, 로켓의 목숨이 걸린 중대한 임무를 수행해야 하는 상황에 놓인다. 로켓의 잔혹한 탄생 배경과 숨겨진 과거가 드러나면서, 가디언즈는 그를 구하기 위한 절박하고 위험한 여정에 뛰어든다. 이번 미션에 실패하면 가디언즈의 존재 자체가 위태로워질 수 있기에, 멤버들은 모든 것을 걸고 헌신한다. 유쾌함 속에 숨겨진 진한 우정과 감동이 우주를 배경으로 펼쳐진다.',
+'mc008_poster.jpg','mc008_bg.jpg','5500','4200000','F','상영중')
+
+-- 탑건 매버릭 (mc009)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc009','탑건 매버릭','액션/드라마','130','15세 이용가', '2022-06-22',
+'최고의 파일럿이자 전설적인 인물 매버릭(피트 미첼)은 30년이 넘는 세월 동안 해군에서 복무하며 파일럿의 길을 고수한다. 어느 날, 그는 해군 파일럿 엘리트들의 교육을 담당하는 ''탑건'' 스쿨의 교관으로 복귀하게 된다. 그곳에서 매버릭은 과거 자신의 파트너 ''구스''의 아들인 ''루스터''를 비롯한 젊은 정예 요원들을 만나게 된다. 매버릭은 목숨을 건 위험천만한 임무를 위해 그들을 훈련시키면서, 과거의 그림자와 마주하게 되고 자신의 깊은 내면과도 싸워야 한다. 한계를 뛰어넘는 비행 액션과 함께 뜨거운 감동이 스크린을 가득 채운다.',
+'mc009_poster.jpg','mc009_bg.jpg','7000','8190000','F','상영중')
+
+-- 기생충 (mc010) (따옴표 수정 완료)
+INTO MOVIE(MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING)
+VALUES ('mc010','기생충','드라마','131','15세 이용가', '2019-05-30',
+'전원 백수인 기택 가족은 반지하에 살며 힘든 생활을 이어간다. 그러던 중, 장남 기우가 고액 과외 면접을 위해 IT 기업 CEO인 박 사장의 대저택을 찾아가게 되면서 두 가족의 삶이 걷잡을 수 없는 방향으로 얽히기 시작한다. 기택 가족은 부유한 박 사장 가족에게 한 명씩 완벽하게 ''취업''하는 기상천외한 계획을 세우고, 곧 그들의 삶은 예상치 못한 방향으로 흘러간다. 이 영화는 두 극과 극의 가족을 통해 현대 사회의 빈부 격차와 계층 간의 문제를 날카롭게 풍자하며, 예측 불가능한 전개와 서스펜스로 관객을 사로잡는다. 칸 영화제 황금종려상 수상작.',
+'mc010_poster.jpg','mc010_bg.jpg','2000','10310375','T','상영종료')
+SELECT * FROM dual;
+
+
+
+/* 8. 예매율 (br1 -> br001) */
+INSERT INTO BOOK_RATE(BOOKRATE_CODE, BOOK_RATE, MOVIE_CODE) VALUES('br001', 55.3, 'mc001');
+INSERT INTO BOOK_RATE(BOOKRATE_CODE, BOOK_RATE, MOVIE_CODE) VALUES('br002', 30.5, 'mc002');
+INSERT INTO BOOK_RATE(BOOKRATE_CODE, BOOK_RATE, MOVIE_CODE) VALUES('br003', 14.2, 'mc003');
+
+/* 9. 사운드 시스템 (tn1 -> tn001) */
+INSERT INTO SOUND(SOUND_CODE, SOUND_NAME) VALUES ('tn001','Dolby Digital 7.1');
+INSERT INTO SOUND(SOUND_CODE, SOUND_NAME) VALUES ('tn002','DTS Digital Surround');
+INSERT INTO SOUND(SOUND_CODE, SOUND_NAME) VALUES ('tn003','Dolby Atmos');
+
+/* 10. 상영관 정보 (tn1 -> tn001, cn1 -> cn001) */
+INSERT INTO THEATHER_INFO(THEATHER_NUM, THEATHER_NAME, TOTAL_SEAT, AVAILABILITY, CINEMA_NUM, SOUND_CODE)
+VALUES ('tn001', 'cinema1', 100, 'T', 'cn001', 'tn001');
+
+INSERT INTO THEATHER_INFO(THEATHER_NUM, THEATHER_NAME, TOTAL_SEAT, AVAILABILITY, CINEMA_NUM, SOUND_CODE)
+VALUES ('tn002', 'cinema2', 100, 'F', 'cn001', 'tn002');
+
+INSERT INTO THEATHER_INFO(THEATHER_NUM, THEATHER_NAME, TOTAL_SEAT, AVAILABILITY, CINEMA_NUM, SOUND_CODE)
+VALUES ('tn003', 'cinema3', 100, 'T', 'cn001', 'tn003');
+
+/* 11. 좌석 (st1 -> st001, tn1 -> tn001) */
+INSERT INTO SEAT(SEAT_CODE, SEAT_ROW, SEAT_COL, AVAILABLE_SEAT, THEATHER_NUM)
+VALUES ('st001', 'A', '1', 'T', 'tn001');
+
+INSERT INTO SEAT(SEAT_CODE, SEAT_ROW, SEAT_COL, AVAILABLE_SEAT, THEATHER_NUM)
+VALUES ('st002', 'A', '2', 'T', 'tn001');
+
+INSERT INTO SEAT(SEAT_CODE, SEAT_ROW, SEAT_COL, AVAILABLE_SEAT, THEATHER_NUM)
+VALUES ('st003', 'B', '1', 'T', 'tn002');
+
+/* 12. 영화 감독 (dt1 -> dt001) */
+INSERT INTO MOVIE_DIRECTOR(DIRECTOR_CODE, MOVIE_CODE) VALUES ('dt001', 'mc001');
+INSERT INTO MOVIE_DIRECTOR(DIRECTOR_CODE, MOVIE_CODE) VALUES ('dt002', 'mc002');
+INSERT INTO MOVIE_DIRECTOR(DIRECTOR_CODE, MOVIE_CODE) VALUES ('dt003', 'mc003');
+
+/* 13. 출연진 (at1 -> at001) */
+INSERT INTO CAST(ACTOR_CODE, MOVIE_CODE) VALUES ('at001','mc001');
+INSERT INTO CAST(ACTOR_CODE, MOVIE_CODE) VALUES ('at002','mc002');
+INSERT INTO CAST(ACTOR_CODE, MOVIE_CODE) VALUES ('at003','mc003');
+
+/* 14. 상영 정보 (scc1 -> scc001, tn1 -> tn001) */
+INSERT INTO SCREEN_INFO(SCREEN_CODE, SCREEN_OPEN, SCREEN_END, SCREEN_PRICE, SCREEN_DATE, SCREEN_DELETE, SCREEN_SHOWING, THEATHER_NUM, MOVIE_CODE)
+VALUES ('scc001', TO_DATE('2025-10-11 11:30', 'YYYY-MM-DD HH24:MI'), TO_DATE('2025-10-11 14:30', 'YYYY-MM-DD HH24:MI'), 14000, TO_DATE('2025-10-11', 'YYYY-MM-DD'), 'F', 'Y', 'tn001', 'mc001');
+
+INSERT INTO SCREEN_INFO(SCREEN_CODE, SCREEN_OPEN, SCREEN_END, SCREEN_PRICE, SCREEN_DATE, SCREEN_DELETE, SCREEN_SHOWING, THEATHER_NUM, MOVIE_CODE)
+VALUES ('scc002', TO_DATE('2025-10-11 15:30', 'YYYY-MM-DD HH24:MI'), TO_DATE('2025-10-11 17:30', 'YYYY-MM-DD HH24:MI'), 14000, TO_DATE('2025-10-11', 'YYYY-MM-DD'), 'T', 'N', 'tn002', 'mc002');
+
+INSERT INTO SCREEN_INFO(SCREEN_CODE, SCREEN_OPEN, SCREEN_END, SCREEN_PRICE, SCREEN_DATE, SCREEN_DELETE, SCREEN_SHOWING, THEATHER_NUM, MOVIE_CODE)
+VALUES ('scc003', TO_DATE('2025-10-11 18:30', 'YYYY-MM-DD HH24:MI'), TO_DATE('2025-10-11 21:30', 'YYYY-MM-DD HH24:MI'), 14000, TO_DATE('2025-10-11', 'YYYY-MM-DD'), 'F', 'Y', 'tn003', 'mc003');
+
+/* 15. 예매 (bn1 -> bn001, scc1 -> scc001) */
+INSERT INTO BOOK(BOOK_NUM, BOOK_TIME, BOOK_STATE, TOTAL_BOOK, SCREEN_CODE, USERS_ID)
+VALUES ('bn001',TO_DATE('2025-10-11 11:10', 'YYYY-MM-DD HH24:MI'),'T',3,'scc001','test1');
+
+INSERT INTO BOOK(BOOK_NUM, BOOK_TIME, BOOK_STATE, TOTAL_BOOK, SCREEN_CODE, USERS_ID)
+VALUES ('bn002',TO_DATE('2025-10-13 15:10', 'YYYY-MM-DD HH24:MI'),'T',2,'scc002','test2');
+
+INSERT INTO BOOK(BOOK_NUM, BOOK_TIME, BOOK_STATE, TOTAL_BOOK, SCREEN_CODE, USERS_ID)
+VALUES ('bn003',TO_DATE('2025-10-15 17:10', 'YYYY-MM-DD HH24:MI'),'T',1,'scc003','test3');
+
+/* 16. 예매 좌석 (sb1 -> sb001, st1 -> st001, scc1 -> scc001, bn1 -> bn001, dc1 -> dc001) */
+INSERT INTO SEAT_BOOK(SEAT_BOOK_CODE, SEAT_CODE, SCREEN_CODE, BOOK_NUM, DISCOUNT_CODE)
+VALUES ('sb001', 'st001', 'scc001', 'bn001', 'dc001');
+
+INSERT INTO SEAT_BOOK(SEAT_BOOK_CODE, SEAT_CODE, SCREEN_CODE, BOOK_NUM, DISCOUNT_CODE)
+VALUES ('sb002', 'st002', 'scc001', 'bn001', 'dc002');
+
+INSERT INTO SEAT_BOOK(SEAT_BOOK_CODE, SEAT_CODE, SCREEN_CODE, BOOK_NUM, DISCOUNT_CODE)
+VALUES ('sb003', 'st003', 'scc002', 'bn002', 'dc005');
+
+/* 17. 결제 (pc1 -> pc001, bn1 -> bn001) */
+INSERT INTO PAYMENT(PAYMENT_CODE, PAYMENT_PRICE, PAYMENT_METHOD, PAYMENT_TIME, PAYMENT_STATE, BOOK_NUM)
+VALUES ('pc001',28000,'신용카드',SYSDATE,'결제 완료','bn001');
+
+INSERT INTO PAYMENT(PAYMENT_CODE, PAYMENT_PRICE, PAYMENT_METHOD, PAYMENT_TIME, PAYMENT_STATE, BOOK_NUM)
+VALUES ('pc002',42000,'신용카드',SYSDATE,'결제 완료','bn002');
+
+INSERT INTO PAYMENT(PAYMENT_CODE, PAYMENT_PRICE, PAYMENT_METHOD, PAYMENT_TIME, PAYMENT_STATE, BOOK_NUM)
+VALUES ('pc003',14000,'신용카드',SYSDATE,'결제 완료','bn003');
+
+/* 18. 리뷰 (rn1 -> rn001, bn1 -> bn001) */
+INSERT INTO REVIEW(REVIEW_NUM, REVIEW_CONTENT, REVIEW_SCORE, REVIEW_DATE, BOOK_NUM, USERS_ID)
+VALUES ('rn001', '이영화재밌네요',75,SYSDATE,'bn001','test1');
+
+INSERT INTO REVIEW(REVIEW_NUM, REVIEW_CONTENT, REVIEW_SCORE, REVIEW_DATE, BOOK_NUM, USERS_ID)
+VALUES ('rn002', '이건 좀 별로에요',55,SYSDATE,'bn002','test2');
+
+INSERT INTO REVIEW(REVIEW_NUM, REVIEW_CONTENT, REVIEW_SCORE, REVIEW_DATE, BOOK_NUM, USERS_ID)
+VALUES ('rn003', '잘 자다 왔어요',99,SYSDATE,'bn003','test3');
+
+/* 19. 트레일러 (tc001 유지) */
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc001','fRqegBxEvEc','mc001');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc002','NBsQkBc_Jsc','mc001');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc003','dOihGQCIw_w','mc001');
+
+/* --- [mc002] 더 퍼스트 슬램덩크 트레일러 3개 --- */
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc004','cGNUpsevAk4','mc002');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc005','O0Bpy4Kfw-U','mc002');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc006','9QmTRDIhkvw','mc002');
+
+
+/* --- [mc003] 엘리멘탈 트레일러 3개 --- */
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc007','BOqFRHCrN-k','mc003');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc008','DwuJeGYlYyw','mc003');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc009','bCrP2fA-jxw','mc003');
+
+
+/* --- [mc004] 엣지 오브 투모로우 트레일러 3개 --- */
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc010','kzj8p61RmVc','mc004');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc011','DVkAC4b6SWQ','mc004');
+
+INSERT INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE)
+VALUES ('tc012','1qg_ynu8FdU','mc004');
+
+INSERT ALL
+/* --- [mc005] 오펜하이머 트레일러 3개 (tc013 ~ tc015) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc013','oSqK_v6zPoM','mc005')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc014','uYPbbksJxIg','mc005')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc015','mm8XfSs4JoA','mc005')
+
+/* --- [mc006] 스즈메의 문단속 트레일러 3개 (tc016 ~ tc018) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc016','7kVu6Io4A4Y','mc006')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc017','4AX-we2X338','mc006')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc018','5suRaBCI21I','mc006')
+
+/* --- [mc007] 아바타: 물의 길 트레일러 3개 (tc019 ~ tc021) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc019','d9MyW72ELq0','mc007')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc020','72KSf1Em1Jk','mc007')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc021','5vbMoYrViDw','mc007')
+
+/* --- [mc008] 가디언즈 오브 갤럭시 Vol.3 트레일러 3개 (tc022 ~ tc024) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc022','XyHr-s3MfCQ','mc008')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc023','u3V5KDHRQvk','mc008')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc024','rMJ8qLe6q3A','mc008')
+
+/* --- [mc009] 탑건 매버릭 트레일러 3개 (tc025 ~ tc027) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc025','BVa34EM3Lvw','mc009')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc026','-yVzb0bqx84','mc009')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc027','htAIuC6DTeE','mc009')
+
+/* --- [mc010] 기생충 트레일러 3개 (tc028 ~ tc030) --- */
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc028','SEUXfv87Wpk','mc010')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc029','jBdRhhSt3Bc','mc010')
+INTO TRAILER(TRAILER_CODE, URL_PATH, MOVIE_CODE) VALUES ('tc030','V5tv6bfCG14','mc010')
+SELECT * FROM dual;
+
+/* 20. 이미지 테이블 데이터 생성 (4개씩 반영) */
+--insert All로 한번에 삽입.
+
+ INSERT ALL
+/* --- [mc001] 이미지 6개 (img001 ~ img006) --- */
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img001','mc001_still_001.jpg','mc001')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img002','mc001_still_002.jpg','mc001')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img003','mc001_still_003.jpg','mc001')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img004','mc001_still_004.jpg','mc001')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img005','mc001_still_005.jpg','mc001')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img006','mc001_still_006.jpg','mc001')
+
+/* --- [mc002] 이미지 6개 (img007 ~ img012) --- */
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img007','mc002_still_001.jpg','mc002')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img008','mc002_still_002.jpg','mc002')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img009','mc002_still_003.jpg','mc002')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img010','mc002_still_004.jpg','mc002')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img011','mc002_still_005.jpg','mc002')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img012','mc002_still_006.jpg','mc002')
+
+/* --- [mc003] 이미지 6개 (img013 ~ img018) --- */
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img013','mc003_still_001.jpg','mc003')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img014','mc003_still_002.jpg','mc003')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img015','mc003_still_003.jpg','mc003')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img016','mc003_still_004.jpg','mc003')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img017','mc003_still_005.jpg','mc003')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img018','mc003_still_006.jpg','mc003')
+
+/* --- [mc004] 이미지 6개 (img019 ~ img024) --- */
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img019','mc004_still_001.jpg','mc004')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img020','mc004_still_002.jpg','mc004')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img021','mc004_still_003.jpg','mc004')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img022','mc004_still_004.jpg','mc004')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img023','mc004_still_005.jpg','mc004')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img024','mc004_still_006.jpg','mc004')
+
+SELECT * FROM DUAL;--이걸로 insertAll을 종료함.
+
+INSERT ALL
+-- 오펜하이머 (mc005) 이미지 6개 (img025 ~ img030)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img025','mc005_still_001.jpg','mc005')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img026','mc005_still_002.jpg','mc005')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img027','mc005_still_003.jpg','mc005')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img028','mc005_still_004.jpg','mc005')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img029','mc005_still_005.jpg','mc005')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img030','mc005_still_006.jpg','mc005')
+
+-- 스즈메의 문단속 (mc006) 이미지 6개 (img031 ~ img036)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img031','mc006_still_001.jpg','mc006')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img032','mc006_still_002.jpg','mc006')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img033','mc006_still_003.jpg','mc006')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img034','mc006_still_004.jpg','mc006')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img035','mc006_still_005.jpg','mc006')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img036','mc006_still_006.jpg','mc006')
+
+-- 아바타 물의 길 (mc007) 이미지 6개 (img037 ~ img042)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img037','mc007_still_001.jpg','mc007')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img038','mc007_still_002.jpg','mc007')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img039','mc007_still_003.jpg','mc007')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img040','mc007_still_004.jpg','mc007')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img041','mc007_still_005.jpg','mc007')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img042','mc007_still_006.jpg','mc007')
+
+-- 가디언즈 오브 갤럭시3 (mc008) 이미지 6개 (img043 ~ img048)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img043','mc008_still_001.jpg','mc008')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img044','mc008_still_002.jpg','mc008')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img045','mc008_still_003.jpg','mc008')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img046','mc008_still_004.jpg','mc008')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img047','mc008_still_005.jpg','mc008')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img048','mc008_still_006.jpg','mc008')
+
+-- 탑건 매버릭 (mc009) 이미지 6개 (img049 ~ img054)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img049','mc009_still_001.jpg','mc009')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img050','mc009_still_002.jpg','mc009')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img051','mc009_still_003.jpg','mc009')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img052','mc009_still_004.jpg','mc009')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img053','mc009_still_005.jpg','mc009')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img054','mc009_still_006.jpg','mc009')
+
+-- 기생충 (mc010) 이미지 6개 (img055 ~ img060)
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img055','mc010_still_001.jpg','mc010')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img056','mc010_still_002.jpg','mc010')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img057','mc010_still_003.jpg','mc010')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img058','mc010_still_004.jpg','mc010')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img059','mc010_still_005.jpg','mc010')
+INTO MOVIE_IMAGE(IMG_CODE, IMG_PATH, MOVIE_CODE) VALUES ('img060','mc010_still_006.jpg','mc010')
+SELECT * FROM dual;
+
+
+/* 21. 공지사항 */
+INSERT INTO ANNOUNCE(ANNOUNCE_NUM, ANNOUNCE_NAME, ANNOUNCE_CONTENT, ANNOUNCE_VIEWS, ANNOUNCE_DATE, ADMIN_ID)
+VALUES (1,'[공지] 2025학년도 대학수학능력시험 수험생 할인 이벤트 안내', '고생하신 수험생 여러분을 위해 특별한 할인을 준비했습니다.\n수험표를 지참하시면 본인 및 동반 1인까지 영화 7천원 관람 가능!\n\n기간: 11/14 ~ 12/15\n방법: 현장에서 수험표 제시',451,SYSDATE,'admin');
+
+INSERT INTO ANNOUNCE(ANNOUNCE_NUM, ANNOUNCE_NAME, ANNOUNCE_CONTENT, ANNOUNCE_VIEWS, ANNOUNCE_DATE, ADMIN_ID)
+VALUES (2,'[시스템] 11월 정기 서버 점검 안내 (11/19)', '안정적인 서비스 제공을 위해 정기 점검을 진행합니다.\n점검 시간: 02:00 ~ 05:00 (3시간)\n해당 시간 동안 예매 및 취소가 제한됩니다.',451,SYSDATE,'admin');
+
+insert into ANNOUNCE(ANNOUNCE_NUM, ANNOUNCE_NAME, ANNOUNCE_CONTENT, ANNOUNCE_VIEWS, ANNOUNCE_DATE, ADMIN_ID)
+values (3,'[무대인사] 영화 <서울의 밤> 개봉주 무대인사 일정', '영화 <서울의 밤> 주연 배우들과 함께하는 무대인사!\n일시: 11월 22일(토)\n참석: 황정민, 정우성 외\n예매 오픈: 11월 16일 오전 10시',1980,sysdate,'admin');
+
+
+
+/* 최종 확정 */
+COMMIT;
+
+/* ============================================== */
+/* 데이터 확인 (SELECT)              */
+/* ============================================== */
+SELECT * FROM ANNOUNCE;
+SELECT * FROM MOVIE_IMAGE;
+SELECT * FROM TRAILER;
+SELECT * FROM REVIEW;
+SELECT * FROM PAYMENT;
+SELECT * FROM SEAT_BOOK;
+SELECT * FROM BOOK;
+SELECT * FROM SCREEN_INFO;
+SELECT * FROM CAST;
+SELECT * FROM MOVIE_DIRECTOR;
+SELECT * FROM SEAT;
+SELECT * FROM SOUND;
+SELECT * FROM THEATHER_INFO;
+SELECT * FROM MOVIE;
+SELECT * FROM CINEMA_INFO;
+SELECT * FROM ACTOR;
+SELECT * FROM DIRECTOR;
+SELECT * FROM DISCOUNT;
+SELECT * FROM ADMIN;
+SELECT * FROM USERS;
+
+/* OFFSET 테스트 (페이징) */
+SELECT *
+FROM ANNOUNCE
+ORDER BY announce_num DESC
+OFFSET 2 ROWS FETCH NEXT 2 ROWS ONLY;
+
+/* 테스트용 에리어 */
+SELECT * FROM MOVIE;
+SELECT * FROM MOVIE_IMAGE;
+SELECT * FROM TRAILER;
+
+SELECT MOVIE_CODE, MOVIE_NAME, MOVIE_GENRE, RUNNING_TIME, MOVIE_GRADE, RELEASE_DATE, INTRO, MAIN_IMAGE, BG_IMAGE, DAILY_AUDIENCE, TOTAL_AUDIENCE, MOVIE_DELETE, SHOWING
+ FROM MOVIE
+	WHERE MOVIE_CODE='mc001';
+
+
+SELECT IMG_CODE, IMG_PATH, MOVIE_CODE
+FROM MOVIE_IMAGE
+WHERE MOVIE_CODE='mc001';
+
+
+select  img_code, img_path, movie_code  from movie_image  where movie_code='mc001';
+
+SELECT TRAILER_CODE, URL_PATH, MOVIE_CODE
+FROM TRAILER
+WHERE MOVIE_CODE = 'mc001';
+
+select * from movie
+where release_date>sysdate;

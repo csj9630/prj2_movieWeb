@@ -1,0 +1,39 @@
+# Eclipse/IntelliJ 등 IDE에서 컴파일된 클래스 파일
+# Java 클래스 파일 (Class files)
+**/*.class
+build/classes
+
+
+# 배포/실행 가능한 아카이브 파일
+# WAR (Web Application ARchive) file
+#**/*.war
+# JAR (Java ARchive) file
+#**/*.jar
+# EAR (Enterprise ARchive) file
+#**/*.ear
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+tmp/
+# WTP (Web Tools Platform) 관련 임시 파일
+.metadata/
+# Eclipse Web Tools Platform generated files
+.wtpgen/
+
+# Visual Studio Code (선택 사항)
+.vscode/
+
+# NetBeans
+nbproject/
+build/
+dist/

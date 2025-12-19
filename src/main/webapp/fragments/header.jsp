@@ -1,0 +1,229 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ include file="../../fragments/siteProperty.jsp"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<h1 class="ci">
+	<a href="${commonURL}/user/main/index.jsp" title="2GV 메인으로 가기"
+		style="height:55px; background-image: url('${commonURL}/resources/images/header.png');"></a>
+</h1>
+<!-- 2019-04-15 마크업 수정 : 고객요청  -->
+<div class="util-area">
+	<div class="right-link">
+		<!-- 로그인 상태 확인하여 상단바 바꿔주기 -->
+		<%
+		// 세션에서 값 가져오기
+		String userId = (String) session.getAttribute("userId");
+		String userName = (String) session.getAttribute("userName");
+		%>
+		<div class="login-status">
+			<%
+			if (userId != null && !"".equals(userId)) {
+			%>
+			<div class="after">
+				<a href="${commonURL}/user/memberLogin.jsp" class="" title=""><%=userName%>님</a>
+				<a href="${commonURL}/user/member/logout.jsp" title="로그아웃">로그아웃</a>
+			</div>
+			<%
+			} else {
+			%>
+			<div class="before">
+				<a href="${commonURL}/user/member/memberLogin.jsp" title="로그인">로그인</a>
+				<a href="${commonURL}/user/member/memberJoinFrm.jsp" title="회원가입">회원가입</a>
+			</div>
+			<%
+			}
+			%>
+		</div>
+
+		<!-- 로그인전 -->
+
+
+		<!-- 로그인후 -->
+		<!-- <div class="after" style="display: none">
+			<a href="https://www.megabox.co.kr/on/oh/ohg/MbLogin/mbLogout.do"
+				class="" title="로그아웃">로그아웃</a> <a
+				href="https://www.megabox.co.kr/movie" class="notice" title="알림">알림</a>
+		</div> -->
+
+		<a href="https://www.megabox.co.kr/booking">빠른예매</a>
+	</div>
+</div>
+<!--// 2019-04-15 마크업 수정 : 고객요청  -->
+
+<div class="link-area">
+	<a href="https://www.megabox.co.kr/movie#layer_sitemap"
+		class="header-open-layer btn-layer-sitemap" title="사이트맵">사이트맵</a>
+	<!-- 새로운 페이지(DB연결 필요)를 만들어야 해서 시간 남으면 하는걸로. -->
+	<!-- <a href="https://www.megabox.co.kr/booking/timetable" class="link-ticket" title="상영시간표">상영시간표</a> -->
+	<!-- 나의 페이지로 바로 가게 만들기 -->
+	<a href="#" class=" btn-layer-mymega" title="나의 메가박스">나의 메가박스</a>
+</div>
+
+<!-- gnb -->
+<nav id="gnb">
+	<ul class="gnb-depth1">
+		<li><a href="https://www.megabox.co.kr/movie"
+			class="gnb-txt-movie" title="영화">영화</a>
+			<div class="gnb-depth2">
+				<ul style="position: absolute; left: 10%;">
+					<li><a href="https://www.megabox.co.kr/movie" title="전체영화">전체영화</a></li>
+				</ul>
+			</div></li>
+		<li></li>
+		<li><a href="https://www.megabox.co.kr/booking"
+			class="gnb-txt-reserve" title="예매">예매</a>
+			<div class="gnb-depth2">
+				<ul>
+					<li><a href="https://www.naver.com" title="빠른예매">빠른예매</a></li>
+					<li><a href="https://www.megabox.co.kr/booking/timetable"
+						title="상영시간표">상영시간표</a></li>
+				</ul>
+			</div></li>
+		<li></li>
+
+		<li style="position: relative;"><a
+			href="https://www.megabox.co.kr/theater/list" class="gnb-txt-theater"
+			title="극장">극장</a>
+
+			<div class="gnb-depth2"
+				style="position: absolute; left: 72%; top: 100%;">
+				<ul>
+					<li><a href="https://www.megabox.co.kr/theater/list"
+						title="전체극장">전체극장</a></li>
+					<li><a href="https://www.megabox.co.kr/specialtheater/list"
+						title="특별관">특별관</a></li>
+				</ul>
+			</div></li>
+	</ul>
+</nav>
+<!--// gnb -->
+
+<!-- 레이어 : 사이트맵 -->
+<!-- 햄버거바 누르면 켜지는 거 야메로 만든 거. 삭제 ㄴㄴㄴㄴㄴㄴㄴ -->
+<script type="text/javascript">
+	document
+			.addEventListener(
+					'DOMContentLoaded',
+					function() {
+						// 1. 사이트맵 레이어 (토글 대상)와 버튼 요소 가져오기
+						const sitemapLayer = document
+								.getElementById('layer_sitemap');
+						const sitemapButton = document
+								.querySelector('.btn-layer-sitemap');
+
+						if (!sitemapLayer || !sitemapButton) {
+							console
+									.error("필요한 요소를 찾을 수 없습니다 (layer_sitemap 또는 btn-layer-sitemap).");
+							return;
+						}
+
+						// 2. 버튼 클릭 이벤트 리스너 등록
+						sitemapButton.addEventListener('click',
+								function(event) {
+									// 기본 앵커 태그 동작(페이지 이동, 주소 변경) 방지
+									event.preventDefault();
+
+									// 3. 현재 display 상태를 확인하고 토글
+									if (sitemapLayer.style.display === 'none') {
+										// 숨겨져 있으면 보이게 (inline으로 변경)
+										sitemapLayer.style.display = 'inline';
+									} else {
+										// 보이고 있으면 숨기게 (none으로 변경)
+										sitemapLayer.style.display = 'none';
+									}
+								});
+
+						// 💡 초기 상태 설정 (필요하다면)
+						// HTML에 style="display: inline;"으로 되어있으므로, 이 부분을 주석 처리하거나 제거하면
+						// 처음에는 숨겨진 상태로 시작하게 할 수 있습니다. (display: none; 이 기본 상태일 때)
+						sitemapLayer.style.display = 'none';
+					});
+</script>
+
+<div id="layer_sitemap" class="header-layer layer-sitemap"
+	style="height: 700px;">
+	<!-- wrap -->
+	<div class="wrap">
+		<a href="https://www.megabox.co.kr/main" class="link-acc"
+			title="사이트맵 레이어 입니다.">사이트맵 레이어 입니다.</a>
+
+		<p class="tit">SITEMAP</p>
+
+		<div class="list position-1">
+			<p class="tit-depth">회사소개</p>
+
+			<ul class="list-depth">
+				<li><a href="https://www.megabox.co.kr/movie" title="전체영화">2GV
+						소개</a></li>
+			</ul>
+		</div>
+
+		<div class="list position-2">
+			<p class="tit-depth">영화</p>
+
+			<ul class="list-depth">
+				<li><a href="https://www.megabox.co.kr/booking" title="빠른예매">전체영화</a></li>
+			</ul>
+		</div>
+
+		<div class="list position-3">
+			<p class="tit-depth">안내</p>
+
+			<ul class="list-depth">
+				<li><a href="https://www.megabox.co.kr/theater/list"
+					title="전체극장">자주 묻는 질문</a></li>
+				<li><a href="https://www.megabox.co.kr/specialtheater/list"
+					title="특별관">공지사항</a></li>
+			</ul>
+		</div>
+
+		<div class="list position-4">
+			<p class="tit-depth">극장</p>
+
+			<ul class="list-depth">
+				<li><a href="https://www.megabox.co.kr/event" title="진행중 이벤트">전체
+						극장</a></li>
+			</ul>
+		</div>
+
+		<div class="list position-5">
+			<p class="tit-depth">예매</p>
+
+			<ul class="list-depth">
+				<li><a href="https://www.megabox.co.kr/store" title="새로운 상품">빠른
+						예매</a></li>
+				<li><a href="https://www.megabox.co.kr/store/megaticket"
+					title="메가티켓">상영 시간표</a></li>
+			</ul>
+		</div>
+		<div class="list position-6">
+			<p class="tit-depth">나의 2GV</p>
+			<ul class="list-depth mymage">
+
+
+				<li><a
+					href="javascript:movePage(&#39;/mypage&#39;,						&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					title="나의 메가박스 홈">마이페이지 홈</a></li>
+				<li><a
+					href="javascript:movePage(&#39;/mypage/bookinglist&#39;,			&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					title="예매/구매내역">예매/구매내역</a></li>
+				<li><a
+					href="javascript:movePage(&#39;/mypage/moviestory&#39;,			&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					title="나의 무비스토리">나의 무비스토리</a></li>
+				<li><a
+					href="javascript:movePage(&#39;/on/oh/ohh/Mypage/mainPage.do?returnURL=info&#39;,&#39;로그인이 필요한 서비스 입니다.&#39;);"
+					title="회원정보">회원정보</a></li>
+
+			</ul>
+		</div>
+
+
+
+		<div class="ir">
+			<a href="https://www.megabox.co.kr/main" class="layer-close"
+				title="레이어닫기">레이어닫기</a>
+		</div>
+	</div>
+	<!--// wrap -->
+</div>
+<!--// 레이어 : 사이트맵 -->
