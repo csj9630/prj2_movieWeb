@@ -71,7 +71,7 @@
 						code += String.format("%3s", i + 1).replace(" ", "0");
 					%>
 					<h2>
-						<a href="${commonURL}/user/movie/detail.jsp?name=<%=code%>">영화 코드 : <%=code%></a>
+						<a href="${commonURL}/user/movie/detail.jsp?code=<%=code%>">영화 코드 : <%=code%></a>
 					</h2>
 					<%
 					} //end for
