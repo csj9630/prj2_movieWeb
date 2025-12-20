@@ -10,7 +10,7 @@
 <%@ include file="../movie/detail_process.jsp"%>
 
 <head>
-<!-- 상단 favicon 이미지..  -->
+<!-- 상단 favicon 이미지  -->
 <link rel="shortcut icon"
 	href="${commonURL}/resources/images/favicon.ico">
 <!-- 전체적인 css -->

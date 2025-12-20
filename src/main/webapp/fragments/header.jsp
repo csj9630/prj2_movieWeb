@@ -21,7 +21,7 @@
 			%>
 			<div class="after">
 				<a href="${commonURL}/user/memberLogin.jsp" class="" title=""><%=userName%>님</a>
-				<a href="${commonURL}/user/member/logout.jsp" title="로그아웃">로그아웃</a>
+				<a href="logout.jsp" title="로그아웃">로그아웃</a>
 			</div>
 			<%
 			} else {
@@ -34,6 +34,7 @@
 			}
 			%>
 		</div>
+
 
 		<!-- 로그인전 -->
 
@@ -56,44 +57,35 @@
 	<!-- 새로운 페이지(DB연결 필요)를 만들어야 해서 시간 남으면 하는걸로. -->
 	<!-- <a href="https://www.megabox.co.kr/booking/timetable" class="link-ticket" title="상영시간표">상영시간표</a> -->
 	<!-- 나의 페이지로 바로 가게 만들기 -->
-	<a href="#" class=" btn-layer-mymega" title="나의 메가박스">나의 메가박스</a>
+	<a href="${commonURL}/user/movie_page/mypage_main.jsp" class=" btn-layer-mymega" title="나의 메가박스">나의 메가박스</a>
 </div>
 
 <!-- gnb -->
 <nav id="gnb">
 	<ul class="gnb-depth1">
-		<li><a href="https://www.megabox.co.kr/movie"
+		<li><a href="${commonURL}/user/movie_all/movieList.jsp"
 			class="gnb-txt-movie" title="영화">영화</a>
 			<div class="gnb-depth2">
 				<ul style="position: absolute; left: 10%;">
-					<li><a href="https://www.megabox.co.kr/movie" title="전체영화">전체영화</a></li>
+					<li><a href="${commonURL}/user/movie_all/movieList.jsp" title="전체영화">전체영화</a></li>
 				</ul>
 			</div></li>
 		<li></li>
-		<li><a href="https://www.megabox.co.kr/booking"
+		<li><a href="${commonURL}/user/fast_booking/fastBooking.jsp"
 			class="gnb-txt-reserve" title="예매">예매</a>
 			<div class="gnb-depth2">
 				<ul>
-					<li><a href="https://www.naver.com" title="빠른예매">빠른예매</a></li>
-					<li><a href="https://www.megabox.co.kr/booking/timetable"
+					<li><a href="${commonURL}/user/fast_booking/fastBooking.jsp" title="빠른예매">빠른예매</a></li>
+					<li><a href="${commonURL}/user/dailyScreenSchedule/dailyScreenSchedule.jsp"
 						title="상영시간표">상영시간표</a></li>
 				</ul>
 			</div></li>
 		<li></li>
 
 		<li style="position: relative;"><a
-			href="https://www.megabox.co.kr/theater/list" class="gnb-txt-theater"
+			href="${commonURL}/user/movie_seaterInfo/movie-seaterInfo.jsp" class="gnb-txt-theater"
 			title="극장">극장</a>
-
-			<div class="gnb-depth2"
-				style="position: absolute; left: 72%; top: 100%;">
-				<ul>
-					<li><a href="https://www.megabox.co.kr/theater/list"
-						title="전체극장">전체극장</a></li>
-					<li><a href="https://www.megabox.co.kr/specialtheater/list"
-						title="특별관">특별관</a></li>
-				</ul>
-			</div></li>
+			</li>
 	</ul>
 </nav>
 <!--// gnb -->
@@ -153,7 +145,7 @@
 			<p class="tit-depth">회사소개</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/movie" title="전체영화">2GV
+				<li><a href="${commonURL}/user/companyIntro/companyIntro.jsp" title="회사소개">2GV
 						소개</a></li>
 			</ul>
 		</div>
@@ -162,7 +154,7 @@
 			<p class="tit-depth">영화</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/booking" title="빠른예매">전체영화</a></li>
+				<li><a href="${commonURL}/user/movie_all/movieList.jsp" title="빠른예매">전체영화</a></li>
 			</ul>
 		</div>
 
@@ -181,8 +173,8 @@
 			<p class="tit-depth">극장</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/event" title="진행중 이벤트">전체
-						극장</a></li>
+				<li><a href="${commonURL}/user/movie_seaterInfo/movie-seaterInfo.jsp" title="진행중 이벤트">
+						극장 정보</a></li>
 			</ul>
 		</div>
 
@@ -190,9 +182,9 @@
 			<p class="tit-depth">예매</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/store" title="새로운 상품">빠른
+				<li><a href="${commonURL}/user/fast_booking/fastBooking.jsp" title="새로운 상품">빠른
 						예매</a></li>
-				<li><a href="https://www.megabox.co.kr/store/megaticket"
+				<li><a href="${commonURL}/user/dailyScreenSchedule/dailyScreenSchedule.jsp"
 					title="메가티켓">상영 시간표</a></li>
 			</ul>
 		</div>
@@ -202,16 +194,16 @@
 
 
 				<li><a
-					href="javascript:movePage(&#39;/mypage&#39;,						&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					href="${commonURL}/user/movie_mypage/mypage_main.jsp"
 					title="나의 메가박스 홈">마이페이지 홈</a></li>
 				<li><a
-					href="javascript:movePage(&#39;/mypage/bookinglist&#39;,			&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					href="${commonURL}/user/moive_book/mypageBook1.jsp"
 					title="예매/구매내역">예매/구매내역</a></li>
 				<li><a
-					href="javascript:movePage(&#39;/mypage/moviestory&#39;,			&#39;로그인이 필요한 서비스 입니다. \n로그인하시겠습니까?&#39;);"
+					href="${commonURL}/user/moive_movieStory/mypage_movieStory1.jsp"
 					title="나의 무비스토리">나의 무비스토리</a></li>
 				<li><a
-					href="javascript:movePage(&#39;/on/oh/ohh/Mypage/mainPage.do?returnURL=info&#39;,&#39;로그인이 필요한 서비스 입니다.&#39;);"
+					href="${commonURL}/user/moive_movieStory/mypage_withdraw1.jsp"
 					title="회원정보">회원정보</a></li>
 
 			</ul>
@@ -220,7 +212,7 @@
 
 
 		<div class="ir">
-			<a href="https://www.megabox.co.kr/main" class="layer-close"
+			<a href="${commonURL}/user/main/index.jsp" class="layer-close"
 				title="레이어닫기">레이어닫기</a>
 		</div>
 	</div>

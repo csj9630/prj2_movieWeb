@@ -13,7 +13,7 @@
 <link rel="shortcut icon"
 	href="${commonURL}/resources/images/favicon.ico">
 	
-<!--//------ bootstrap CDN -->	
+<!--//------ bootstrap CDN -->
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
 	rel="stylesheet">

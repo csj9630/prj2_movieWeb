@@ -60,7 +60,7 @@ try {
 		// 4. Array에 추가
 		jsonArr.add(jsonObj);
 	} //end for
-	System.out.println(sbList.toString());
+	//System.out.println(sbList.toString());
 	out.print(jsonArr.toJSONString());
 	
 	
