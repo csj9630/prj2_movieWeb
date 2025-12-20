@@ -46,6 +46,7 @@ try {
 		jsonObj.put("movie_name", dto.getMovieName());
 		jsonObj.put("movie_grade", dto.getMovieGrade());
 		jsonObj.put("theather_name", dto.getTheatherName());
+		jsonObj.put("theather_num", dto.getTheatherNum());
 
 		// 2. 시간 데이터 (포맷팅이 필요할 수 있음)
 		jsonObj.put("screen_open", sdf.format(dto.getScreenOpen()));

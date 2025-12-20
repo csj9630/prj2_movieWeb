@@ -51,7 +51,7 @@ public class ScheduleDAO {
 			// 4. 쿼리문 생성 객체 얻기
 			String sql =
 					" select	s.screen_code, m.movie_grade, m.movie_code, m.movie_name, m.running_time, " +
-					" t.theather_name, s.screen_open,s.screen_end, s.screen_date,  t.total_seat," +
+					" t.theather_name, t.theather_num,s.screen_open,s.screen_end, s.screen_date,  t.total_seat," +
 					" (select count(*) from seat_book b where b.screen_code = s.screen_code) as seat_count " +
 					" from	screen_info s " +
 					" join	movie m on s.movie_code = m.movie_code " +
@@ -82,6 +82,7 @@ public class ScheduleDAO {
             
             // 3. theather_info 테이블 데이터
             sbDTO.setTheatherName(rs.getString("theather_name"));
+            sbDTO.setTheatherNum(rs.getString("theather_num"));
             sbDTO.setTotalSeat(rs.getInt("total_seat"));
             
             // 4. 서브쿼리 결과 (예약된 좌석 수)

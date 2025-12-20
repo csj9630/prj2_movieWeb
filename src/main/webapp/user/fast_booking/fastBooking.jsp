@@ -301,6 +301,7 @@ $(function() {
 		form.find("input[name=movieName]").val(row.data("movie-name"));
 		form.find("input[name=screenCode]").val(row.data("screen-code"));
 		form.find("input[name=theaterName]").val(row.data("theater-name"));
+		form.find("input[name=theaterNum]").val(row.data("theater-num"));
 		form.find("input[name=screenOpen]").val(row.data("screen-open"));
 		form.find("input[name=screenEnd]").val(row.data("screen-end"));
 		
@@ -396,6 +397,7 @@ function displaySchedule(data) {
 	displayHTML += '	<input type="hidden" name="movieName">';
 	displayHTML += '	<input type="hidden" name="screenCode">';
 	displayHTML += '	<input type="hidden" name="theaterName">';
+	displayHTML += '	<input type="hidden" name="theaterNum">';
 	displayHTML += '	<input type="hidden" name="screenOpen">';
 	displayHTML += '	<input type="hidden" name="screenEnd">';
 	displayHTML += '	<input type="hidden" name="screenDate">';
@@ -429,6 +431,7 @@ function displaySchedule(data) {
 	    displayHTML += '        data-movie-code="' + item.movie_code + '" ';
 	    displayHTML += '        data-movie-name="' + item.movie_name + '" ';
 	    displayHTML += '        data-theater-name="' + item.theather_name + '" ';
+	    displayHTML += '        data-theater-num="' + item.theather_num + '" ';
 	    displayHTML += '        data-screen-open="' + item.screen_open + '" ';
 	    displayHTML += '        data-screen-end="' + item.screen_end + '" ';
 	    displayHTML += '        data-rem-seat="' + item.rem_seat + '" ';
@@ -466,6 +469,7 @@ function displaySchedule(data) {
             movieCode: $(this).data('movie-code'),
             movieName: $(this).data('movie-name'),
             theaterName: $(this).data('theater-name'),
+            theaterNum: $(this).data('theater-num'),
             screenOpen: $(this).data('screen-open'),
             screenEnd: $(this).data('screen-end'),
             remSeat: $(this).data('rem-seat'),

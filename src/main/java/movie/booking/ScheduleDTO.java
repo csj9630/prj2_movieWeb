@@ -3,6 +3,25 @@ package movie.booking;
 import java.util.Date;
 
 public class ScheduleDTO {
+	@Override
+	public String toString() {
+		return "ScheduleDTO [screenCode=" + screenCode + ", screenDate=" + screenDate + ", screenOpen=" + screenOpen
+				+ ", screenEnd=" + screenEnd + ", movieCode=" + movieCode + ", movieGrade=" + movieGrade
+				+ ", movieName=" + movieName + ", runningTime=" + runningTime + ", theatherName=" + theatherName
+				+ ", theatherNum=" + theatherNum + ", totalSeat=" + totalSeat + ", seatCount=" + seatCount + "]";
+	}
+
+
+	public String getTheatherNum() {
+		return theatherNum;
+	}
+
+
+	public void setTheatherNum(String theatherNum) {
+		this.theatherNum = theatherNum;
+	}
+
+
 	// screen_info 테이블
     private String screenCode;
     private String screenDate;
@@ -17,6 +36,7 @@ public class ScheduleDTO {
 
     // theather_info 테이블 (Join)
     private String theatherName;
+    private String theatherNum;
     private int totalSeat;
 
     // 서브쿼리 결과 (예약 좌석 수)
@@ -116,18 +136,10 @@ public class ScheduleDTO {
 		this.seatCount = seatCount;
 	}
 
-	@Override
-	public String toString() {
-		return "ScreenBookingDTO [screenCode=" + screenCode + ", screenDate=" + screenDate + ", screenOpen="
-				+ screenOpen + ", screenEnd=" + screenEnd + ", movieCode=" + movieCode + ", movieGrade=" + movieGrade
-				+ ", movieName=" + movieName + ", runningTime=" + runningTime + ", theatherName=" + theatherName
-				+ ", totalSeat=" + totalSeat + ", seatCount=" + seatCount + "]";
-	}
-
-
-
+	
 	public ScheduleDTO(String screenCode, String screenDate, Date screenOpen, Date screenEnd, String movieCode,
-			String movieGrade, String movieName, int runningTime, String theatherName, int totalSeat, int seatCount) {
+			String movieGrade, String movieName, int runningTime, String theatherName, String theatherNum,
+			int totalSeat, int seatCount) {
 		super();
 		this.screenCode = screenCode;
 		this.screenDate = screenDate;
@@ -138,9 +150,11 @@ public class ScheduleDTO {
 		this.movieName = movieName;
 		this.runningTime = runningTime;
 		this.theatherName = theatherName;
+		this.theatherNum = theatherNum;
 		this.totalSeat = totalSeat;
 		this.seatCount = seatCount;
 	}
+
 
 	public ScheduleDTO() {
 		super();

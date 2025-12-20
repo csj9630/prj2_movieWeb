@@ -17,7 +17,7 @@ String theaterName=request.getParameter("theaterName");
 String screenOpen=request.getParameter("screenOpen");
 String screenEnd=request.getParameter("screenEnd");
 String screenDate=request.getParameter("screenDate");
-/* String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠㅠ.. */
+String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠㅠ..
 MovieService ms=MovieService.getInstance();
 String imgPath=ms.showMainImage(movieCode);
 request.setAttribute("imgPath", imgPath);
