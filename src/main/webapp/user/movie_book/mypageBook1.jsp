@@ -361,7 +361,7 @@ if (bookList == null) {
                                   }
                               %>
                           </td>
-                          <td><%= "T".equals(booking.getBook_state()) ? "예매 중" : "취소" %></td>
+                          <td><%= "결제완료".equals(booking.getBook_state()) ? "예매 완료" : "예매 취소" %></td>
                         </tr>
                   <%
                       }
