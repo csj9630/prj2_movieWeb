@@ -1,6 +1,10 @@
 package MovieWithdraw;
 
+import kr.co.sist.chipher.DataDecryption;
+import SiteProperty.SitePropertyVO;
 import java.sql.SQLException;
+import java.security.NoSuchAlgorithmException;
+import kr.co.sist.chipher.DataEncryption;
 
 public class MovieWithdrawService {
     private static MovieWithdrawService service;
@@ -16,6 +20,15 @@ public class MovieWithdrawService {
     }
 
     public boolean loginCheck(String id, String pass) {
+    	// 비밀번호 암호화 (SHA-1)
+    	if(pass != null && !pass.isEmpty()) {
+    		try {
+				pass = DataEncryption.messageDigest("SHA-1", pass);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
         MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
         try {
             return dao.selectLogin(id, pass);
@@ -27,28 +40,69 @@ public class MovieWithdrawService {
 
     public MovieWithdrawDTO getUserInfo(String id) {
         MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
+        MovieWithdrawDTO dto = null;
         try {
-            return dao.selectUser(id);
+            dto = dao.selectUser(id);
+            // 복호화 (이메일, 휴대폰 번호)
+			if (dto != null) {
+				SitePropertyVO sp = new SitePropertyVO();
+				String key = sp.getKey();
+				DataDecryption dd = new DataDecryption(key);
+				try {
+					if (dto.getEmail() != null) {
+						dto.setEmail(dd.decrypt(dto.getEmail()));
+					}
+					if (dto.getPhone_num() != null) {
+						dto.setPhone_num(dd.decrypt(dto.getPhone_num()));
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null;
+        return dto;
     }
 
     public boolean updateUserInfo(MovieWithdrawDTO dto) {
-        MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
-        try {
-            return dao.updateUser(dto) > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
+		// 암호화 로직 추가
+		SitePropertyVO sp = new SitePropertyVO();
+		String key = sp.getKey();
+		DataEncryption de = new DataEncryption(key);
+		
+		try {
+			if(dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+				dto.setEmail(de.encrypt(dto.getEmail()));
+			}
+			if(dto.getPhone_num() != null && !dto.getPhone_num().isEmpty()) {
+				dto.setPhone_num(de.encrypt(dto.getPhone_num()));
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
+		MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
+		try {
+			return dao.updateUser(dto) > 0;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
     public boolean updatePassword(String id, String newPass) {
+    	// 비밀번호 암호화 (SHA-1)
+    	if(newPass != null && !newPass.isEmpty()) {
+    		try {
+    			newPass = DataEncryption.messageDigest("SHA-1", newPass);
+			} catch (NoSuchAlgorithmException e) {
+				e.printStackTrace();
+			}
+    	}
+    	
         MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
         try {
-            // 여기서 암호화 로직(DataEncryption)을 탈 수 있음. 현재는 Mock.
             return dao.updatePass(id, newPass) > 0;
         } catch (SQLException e) {
             e.printStackTrace();

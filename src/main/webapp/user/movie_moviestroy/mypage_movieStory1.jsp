@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> 
 <%@ include file="../../fragments/siteProperty.jsp"%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%> 
 <%@ page import="java.util.List"%>
 <%@ page import="moviestory.service.MovieStoryService"%>
@@ -13,6 +14,7 @@ pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+    <jsp:include page="../../fragments/loginChk.jsp" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>나의 무비스토리</title>
@@ -27,9 +29,9 @@ pageEncoding="UTF-8"%>
 <%
     // Session & User ID check
     String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
+   /*  if (userId == null) {
         userId = "test1"; // Fallback for testing (Real DB Data: test1)
-    }
+    } */
 
     // 3. 영화 데이터 생성 (Real DB Data)
     // [수정] DB 연동 시 에러가 발생해도 페이지가 깨지지 않도록 try-catch 추가
@@ -290,7 +292,7 @@ pageEncoding="UTF-8"%>
       <div class="container">
         <ol class="breadcrumb-list">
           <li>
-            <a href="index.html" title="홈으로 이동">
+            <a href="${commonURL}/user/main/index.jsp" title="홈으로 이동">
               <i class="fa-solid fa-house"></i>
             </a>
             <span class="breadcrumb-separator">></span>
@@ -364,7 +366,7 @@ pageEncoding="UTF-8"%>
     </div>
 
     <!-- 푸터 -->
-    <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+    <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
 
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>

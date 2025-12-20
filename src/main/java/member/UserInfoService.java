@@ -233,11 +233,13 @@ public class UserInfoService {
 		try {
 			uDTO=ulDAO.selectLogin(lDTO);
 			//pDTO에는 아이디, 이름(암호화 > 복호화), 생년월일이 할당
-			DataDecryption dd= new DataDecryption(key);//대칭키 : 암호화키와 복호화 키가 같아야 한다.
-			try {
-				uDTO.setUsers_name(dd.decrypt(uDTO.getUsers_name()));
-			} catch (Exception e) {
-				e.printStackTrace();
+			if (uDTO != null) {
+				DataDecryption dd= new DataDecryption(key);//대칭키 : 암호화키와 복호화 키가 같아야 한다.
+				try {
+					uDTO.setUsers_name(dd.decrypt(uDTO.getUsers_name()));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

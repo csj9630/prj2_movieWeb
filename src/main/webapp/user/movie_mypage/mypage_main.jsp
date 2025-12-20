@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%> 
 <%@ include file="../../fragments/siteProperty.jsp"%> 
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ page import="java.util.List"%>
 <%@ page import="movie_mypage.MypageService"%>
@@ -12,9 +13,9 @@ pageEncoding="UTF-8"%>
 <%
     // 세션에서 사용자 ID 가져오기
     String userId = (String) session.getAttribute("userId");
-    if (userId == null) {
+   /*  if (userId == null) {
         userId = "test1"; // 테스트용 기본값
-    }
+    } */
     
     // 서비스 호출 - 새로고침 시 자동 갱신 (AJAX 미사용)
     MypageService mypageService = MypageService.getInstance();
@@ -29,7 +30,20 @@ pageEncoding="UTF-8"%>
     List<BookDTO> recentBookings = mypageService.getRecentBookingsWeek(userId);
     
     // 4. 마스킹된 사용자 이름
-    String maskedName = mypageService.getMaskedUserName(userId);
+    // 4. 마스킹된 사용자 이름 (세션에서 가져와서 처리)
+    String userName = (String) session.getAttribute("userName");
+    String maskedName = "회원";
+    
+    if(userName != null && !userName.isEmpty()) {
+        if(userName.length() == 2) {
+            maskedName = userName.charAt(0) + "*";
+        } else if(userName.length() >= 3) {
+            // 가운데 글자 마스킹 (단순화: 홍*동)
+            maskedName = userName.charAt(0) + "*" + userName.charAt(userName.length() - 1);
+        } else {
+            maskedName = userName;
+        }
+    }
     
     // EL에서 사용하기 위해 pageContext에 저장
     pageContext.setAttribute("watchedCount", watchedCount);
@@ -41,6 +55,7 @@ pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+    <%@ include file="../../fragments/loginChk.jsp"%>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>마이페이지 - 2GV</title>
@@ -124,7 +139,7 @@ pageEncoding="UTF-8"%>
       <div class="container">
         <ol class="breadcrumb-list">
           <li>
-            <a href="${pageContext.request.contextPath}/" title="홈으로 이동">
+            <a href="${commonURL}/user/main/index.jsp" title="홈으로 이동">
               <i class="fa-solid fa-house"></i>
             </a>
             <span class="breadcrumb-separator">></span>
@@ -226,6 +241,6 @@ pageEncoding="UTF-8"%>
     </div>
 
     <!-- 푸터 -->
-    <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+    <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
   </body>
 </html>

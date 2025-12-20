@@ -319,9 +319,9 @@
       .btn-withdraw-link {
         height: 35px;
         padding: 0 15px;
-        background-color: white;
-        border: 1px solid #ccc;
-        color: #666;
+        background-color: #3e2675;
+        border: none;
+        color: white;
         font-size: 13px;
         cursor: pointer;
         margin-left: 10px;
@@ -329,8 +329,8 @@
       }
 
       .btn-withdraw-link:hover {
-        border-color: #3e2675;
-        color: #3e2675;
+        background-color: #553a94;
+        color: white;
       }
 
       /* 하단 버튼 그룹 */

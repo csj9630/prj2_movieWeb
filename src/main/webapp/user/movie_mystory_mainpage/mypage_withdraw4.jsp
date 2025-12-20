@@ -1,10 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%> <%@
+    pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
+ <%@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%> <%-- <%@ include
     file="../../fragments/loginChk2.jsp"%> --%>
     <!DOCTYPE html>
     <html lang="ko">
       <head>
+<jsp:include page="../../fragments/loginChk.jsp" />
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>회원탈퇴 - 2GV</title>
@@ -52,7 +54,7 @@
           <div class="container">
             <ol class="breadcrumb-list">
               <li>
-                <a href="index.html" title="홈으로 이동">
+                <a href="${commonURL}/user/main/index.jsp" title="홈으로 이동">
                   <i class="fa-solid fa-house"></i>
                 </a>
                 <span class="breadcrumb-separator">></span>
@@ -80,7 +82,7 @@
     
               <div class="withdraw-guide">
                 <p class="guide-intro">
-                  [주의] 메가박스 회원탈퇴를 신청하기 전에 안내 사항을 꼭
+                  [주의] 2GV 회원탈퇴를 신청하기 전에 안내 사항을 꼭
                   확인해주세요.
                 </p>
     
@@ -109,7 +111,7 @@
                     데이터는 복구되지 않습니다.)
                   </p>
                   <ul>
-                    <li>메가박스 멤버십 포인트 및 적립/차감 내역</li>
+                    <li>2GV 멤버십 포인트 및 적립/차감 내역</li>
                     <li>관람권 및 쿠폰</li>
                     <li>영화 관람 내역</li>
                     <li>간편 로그인 연동 정보</li>
@@ -153,6 +155,6 @@
     
     <!-- Script moved to head -->
         <!-- 푸터 -->
-        <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+        <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
       </body>
     </html>

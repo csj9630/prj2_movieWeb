@@ -345,7 +345,7 @@
       }
 
       .btn-withdraw {
-        background-color: #ccc;
+        background-color: #3e2675;
         color: white;
         border: none;
       }

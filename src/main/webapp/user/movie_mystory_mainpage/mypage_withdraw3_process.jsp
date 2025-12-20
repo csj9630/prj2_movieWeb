@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ include file="../../fragments/siteProperty.jsp"%>
 <%@ page import="MovieWithdraw.MovieWithdrawService"%>
 <%
     request.setCharacterEncoding("UTF-8");
@@ -24,11 +25,11 @@
     boolean isSuccess = service.updatePassword(userId, newPass);
 
     if(isSuccess) {
+		session.invalidate(); // 비밀번호 변경 후 로그아웃 처리
 %>
     <script>
         alert("비밀번호가 변경되었습니다. 다시 로그인해주세요.");
-        // 로그아웃 처리 후 메인으로 이동 (가정)
-        location.href = "../movie/index_temp.jsp"; 
+        location.href = "${commonURL}/user/main/index.jsp"; 
     </script>
 <%
     } else {

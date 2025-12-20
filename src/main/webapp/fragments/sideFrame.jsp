@@ -239,7 +239,7 @@ pageEncoding="UTF-8"%>
     if (activeMenu == null) activeMenu = "";
 %>
 <aside class="sidebar">
-  <div class="sidebar-title" onclick="location.href='../movie_mypage/mypage_main.jsp'" style="cursor: pointer;">나의 메가박스</div>
+  <div class="sidebar-title" onclick="location.href='../movie_mypage/mypage_main.jsp'" style="cursor: pointer;">나의 2GV</div>
   <div class="sidebar-menu">
     <div class="menu-group">
       <div class="menu-group-title <%= "booking".equals(activeMenu) ? "active" : "" %>" onclick="location.href='../movie_book/mypageBook1.jsp'">예매/구매내역</div>

@@ -1,10 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="../../fragments/siteProperty.jsp"%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+<jsp:include page="../../fragments/loginChk.jsp" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>회원정보 인증 - 2GV</title>
@@ -90,7 +92,7 @@
       <div class="container">
         <ol class="breadcrumb-list">
           <li>
-            <a href="index.html" title="홈으로 이동">
+            <a href="${commonURL}/user/main/index.jsp" title="홈으로 이동">
               <i class="fa-solid fa-house"></i>
             </a>
             <span class="breadcrumb-separator">></span>
@@ -140,6 +142,6 @@
     </div>
 
     <!-- 푸터 -->
-    <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+    <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
   </body>
 </html>

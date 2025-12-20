@@ -5,13 +5,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
 <%@ include file="../../fragments/siteProperty.jsp"%>
+
 <%@ page import="java.time.LocalDate" %>
 <%
 request.setCharacterEncoding("UTF-8");
 // 1. [Session 처리]
 String userId = (String) session.getAttribute("userId");
-if (userId == null)
-	userId = "test1"; 
+/* if (userId == null)
+	userId = "test1";  */
 
 // 2. [파라미터 수신]
 String paramType = request.getParameter("type");
@@ -59,6 +60,7 @@ if (bookList == null) {
 <!DOCTYPE html>
 <html lang="ko">
   <head>
+<jsp:include page="../../fragments/loginChk.jsp" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>나의 예매내역 - 2GV</title>
@@ -238,21 +240,17 @@ if (bookList == null) {
       <div class="container">
         <ol class="breadcrumb-list">
           <li>
-            <a href="index.html" title="홈으로 이동">
+            <a href="${commonURL }/user/main/index.jsp" title="홈으로 이동">
               <i class="fa-solid fa-house"></i>
             </a>
             <span class="breadcrumb-separator">></span>
           </li>
           <li>
-            <a href="#">나의 메가박스</a>
+            <a href="#">나의 2GV</a>
             <span class="breadcrumb-separator">></span>
           </li>
           <li>
             <a href="#">나의 예매내역</a>
-            <span class="breadcrumb-separator">></span>
-          </li>
-          <li>
-            <span class="current">관람권/상영권</span>
           </li>
         </ol>
       </div>
@@ -427,7 +425,7 @@ if (bookList == null) {
     <!-- Script moved to head -->
     <!-- 푸터 -->
     <div id="footer">
-    <%@ include file="../../fragments/footer.jsp" %>
+    <jsp:include page="../../fragments/footer.jsp"/>
     </div>
   </body>
 </html>

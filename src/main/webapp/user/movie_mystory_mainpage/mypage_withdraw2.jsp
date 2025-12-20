@@ -1,16 +1,17 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ include file="../../fragments/siteProperty.jsp"%>
+
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ page import="MovieWithdraw.MovieWithdrawDAO" %>
+<%@ page import="MovieWithdraw.MovieWithdrawService" %>
 <%@ page import="MovieWithdraw.MovieWithdrawDTO" %>
 <%
     // 로그인 체크 및 데이터 조회
     String userId = (String)session.getAttribute("userId");
     if(userId == null) userId = "test1"; // 테스트용
 
-    MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
-    MovieWithdrawDTO dto = dao.selectUser(userId);
+    MovieWithdrawService service = MovieWithdrawService.getInstance();
+    MovieWithdrawDTO dto = service.getUserInfo(userId);
 
     String email = "";
     if(dto != null && dto.getEmail() != null) email = dto.getEmail();
@@ -28,6 +29,7 @@
 <!DOCTYPE html>	
 <html lang="ko">
   <head>
+<jsp:include page="../../fragments/loginChk.jsp" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>개인정보 수정 - 2GV</title>
@@ -222,7 +224,7 @@
       <div class="container">
         <ol class="breadcrumb-list">
           <li>
-            <a href="index.html" title="홈으로 이동">
+            <a href="${commonURL}/user/main/index.jsp" title="홈으로 이동">
               <i class="fa-solid fa-house"></i>
             </a>
             <span class="breadcrumb-separator">></span>
@@ -275,7 +277,7 @@
               <tr>
                 <th>이름 <span class="required">*</span></th>
                 <td>
-                  <input type="text" class="form-input" value="<%= dto != null ? dto.getUsers_name() : "" %>" readonly style="background-color: #f0f0f0;" />
+                  <input type="text" class="form-input" value="<%= session.getAttribute("userName") %>" readonly style="background-color: #f0f0f0;" />
                 </td>
               </tr>
               <tr>
@@ -553,6 +555,6 @@
     });
     </script>
     <!-- 푸터 -->
-    <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+    <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
   </body>
 </html>

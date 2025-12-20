@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="../../fragments/siteProperty.jsp"%>
+
 <%@
     taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%-- <%@ include
@@ -12,8 +13,8 @@
 request.setCharacterEncoding("UTF-8");
 // 1. [Session 처리]
 String userId = (String) session.getAttribute("userId");
-if (userId == null)
-	userId = "test1"; // Hotfix for testing (Real DB Data: test1)
+/* if (userId == null)
+	userId = "test1"; // Hotfix for testing (Real DB Data: test1) */
 // 2. [DB 연동 및 데이터 조회]
 MovieReviewService service = MovieReviewService.getInstance();
 List<MovieReviewDTO> reviewList = service.getReviewList(userId); // null 체크 
@@ -30,6 +31,7 @@ System.out.println("[DEBUG] mypage_review.jsp - ReviewList Size: " + (reviewList
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<jsp:include page="../../fragments/loginChk.jsp" />
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>나의 관람평</title>
@@ -208,10 +210,10 @@ System.out.println("[DEBUG] mypage_review.jsp - ReviewList Size: " + (reviewList
 	<nav class="breadcrumb" aria-label="breadcrumb">
 		<div class="container">
 			<ol class="breadcrumb-list">
-				<li><a href="index.html" title="홈으로 이동"> <i
+				<li><a href="${commonURL}/user/main/index.jsp" title="홈으로 이동"> <i
 						class="fa-solid fa-house"></i>
 				</a> <span class="breadcrumb-separator">></span></li>
-				<li><a href="#">나의 메가박스</a> <span class="breadcrumb-separator">></span>
+				<li><span class="current">나의 2GV</span> <span class="breadcrumb-separator">></span>
 				</li>
 				<li><span class="current">나의 관람평</span></li>
 			</ol>
@@ -301,7 +303,7 @@ System.out.println("[DEBUG] mypage_review.jsp - ReviewList Size: " + (reviewList
 	</div>
 
 	<!-- 푸터 -->
-	<div id="footer"><%@ include file="../../fragments/footer.jsp"%></div>
+	<div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
 
     <!-- Script moved to head -->
 </body>
