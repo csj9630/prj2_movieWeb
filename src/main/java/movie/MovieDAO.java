@@ -61,7 +61,7 @@ public class MovieDAO {
 		
 		try {
 			con=dbCon.getConn();
-			String countAll="select count(*) cnt from movie";
+			String countAll="select count(*) cnt from movie where release_date<sysdate";
 			pstmt=con.prepareStatement(countAll);
 			
 			rs=pstmt.executeQuery();
@@ -340,6 +340,7 @@ public class MovieDAO {
 			.append(" FROM movie m ")
 			.append(" INNER JOIN book_rate b ")
 			.append("   ON b.movie_code = m.movie_code ")
+			.append(" WHERE m.release_date < sysdate ")
 			.append(" ORDER BY b.book_rate DESC ")
 			.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 

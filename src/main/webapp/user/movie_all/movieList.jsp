@@ -39,9 +39,10 @@ $(function() {
 	//$("#btnSearch").click(searchMovie);
 	$("#ibxMovieNmSearch").keyup(searchMovie);
 
-	/* 개봉작만 버튼 클릭 시  */
-	$(".btnOnAir").click();
-
+	if ($("#ibxMovieNmSearch").val().trim().length > 0) {
+        searchMovie();
+    };
+    
 	/* 더보기 버튼 기능 ajax 방식으로 추가 예정 */
 	$("#btnAddMovie").click(function() {
 		filterRelease();
@@ -91,6 +92,8 @@ $(function() {
 				/* ajax 요청이 성공해서 넘어올 데이터 */
 				$.each(jsonArr, (idx, obj) => {
 					var rank=idx+startRank;
+					var releasedate = obj.releasedate.replace(/-/g, ".");
+					
 					var appendMovie = 
 				        "<li tabindex='0' class='no-img'>" +
 
@@ -114,8 +117,8 @@ $(function() {
 				            "</div>" +
 
 				            "<div class='rate-date'>" +
-				                "<span class='rate'>예매율 " + (obj.rate || 0) + "%</span>" +
-				                "<span class='date'>개봉일 " + obj.releasedate + "</span>" +
+				                "<span class='rate'>예매율 " + (obj.bookrate||0) + "%</span>" +
+				                "<span class='date'>개봉일 " + releasedate + "</span>" +
 				            "</div>" +
 
 				            "<div class='btn-util'>" +
@@ -143,6 +146,7 @@ $(function() {
 		});//filterRelease
 	}
 });
+
 </script>
 </head>
 
@@ -177,14 +181,6 @@ $(function() {
 
 				<!-- movie-list-util -->
 				<div class="movie-list-util mt40">
-					<!-- 박스오피스 -->
-					<div class="topSort" style="display: block;">
-
-						<div class="onair-condition">
-							<button type="button" title="개봉작만 보기" class="btn-onair btnOnAir">개봉작만</button>
-						</div>
-					</div>
-					<!--// 박스오피스 -->
 					<%
 					int currentPage = 1;
 					int size = 4;
@@ -205,10 +201,10 @@ $(function() {
 						검색되었습니다.
 					</p>
 					<!--// 검색결과 없을 때 -->
-
+					<c:set var="searchText" value="${param.searchText}"></c:set>
 					<div class="movie-search">
 						<input type="text" title="영화명을 입력하세요" id="ibxMovieNmSearch"
-							name="ibxMovieNmSearch" placeholder="영화명 검색" class="input-text">
+							name="ibxMovieNmSearch" placeholder="영화명 검색" class="input-text" value="${searchText}">
 						<button type="button" class="btn-search-input" id="btnSearch">검색</button>
 					</div>
 				</div>

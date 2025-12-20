@@ -32,9 +32,9 @@
 <script type="text/javascript">
 $(function() {
 	// 개봉일순 버튼 누르면
-	$("#sortRelease").click(sortMoiveList);
+	//$("#sortRelease").click(sortMoiveList);
 	// 가나다순 버튼 누르면
-	$("#sortAlphabet").click(sortMoiveList);
+	//$("#sortAlphabet").click(sortMoiveList);
 	
 	$("#ibxMovieNmSearch").keyup(searchMovie);
 	
@@ -100,6 +100,8 @@ function filterUpComming(){
 			/* ajax 요청이 성공해서 넘어올 데이터 */
 			$.each(jsonArr, (idx, obj) => {
 				var rank=idx+startRank;
+				var releasedate = obj.releasedate.replace(/-/g, ".");
+				
 				var appendMovie = 
 			        "<li tabindex='0' class='no-img'>" +
 
@@ -123,8 +125,8 @@ function filterUpComming(){
 			            "</div>" +
 
 			            "<div class='rate-date'>" +
-			                "<span class='rate'>예매율 " + (obj.rate || 0) + "%</span>" +
-			                "<span class='date'>개봉일 " + obj.releasedate + "</span>" +
+			                "<span class='rate'>예매율 " + (obj.bookrate||0) + "%</span>" +
+			                "<span class='date'>개봉일 " + releasedate + "</span>" +
 			            "</div>" +
 
 			            "<div class='btn-util'>" +
@@ -200,12 +202,12 @@ request.setAttribute("size", size);
 			<!-- movie-list-util -->
 			<div class="movie-list-util mt40">
 				<!-- 상영예정작 -->
-				<div class="topSort">
+				<!-- <div class="topSort">
 					<div class="movie-sorting sortTab">
 						<span><button type="button" class="btn on" id="sortRelease" sort-type="rfilmDe">개봉일순</button></span>
 						<span><button type="button" class="btn" id="sortAlphabet" sort-type="title">가나다순</button></span>
 					</div>
-				</div>
+				</div> -->
 				<!--// 상영예정작 -->
 
 				<!-- 검색결과 없을 때 -->

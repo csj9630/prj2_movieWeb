@@ -21,6 +21,7 @@ for(MovieDTO mDTO:list) {
     obj.put("mainimage", mDTO.getMoviemainimg());
     obj.put("moviegrade", mDTO.getMoviegrade());
     obj.put("releasedate", mDTO.getMoviereleasedate());
+    obj.put("bookrate", mDTO.getBookrate());
     jsonArr.add(obj);
 }
 out.print(jsonArr.toString());

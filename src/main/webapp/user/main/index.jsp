@@ -37,7 +37,14 @@
 $(function(){
 	$("#btnSort").click(function(){
 		location.href="${commonURL}/user/movie_all/movieListComming.jsp"
-	});
+	});//click
+	
+	//$("#movieName")
+	$("#btnSearch").click(function(){
+		var searhText=$("#movieName").val();
+		location.href="${commonURL}/user/movie_all/movieList.jsp?searchText="+searhText;
+	});//click
+	
 });
 </script>
 <body style="padding: 0px;">
