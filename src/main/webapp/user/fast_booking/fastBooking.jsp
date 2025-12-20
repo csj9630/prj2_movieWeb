@@ -303,6 +303,9 @@ $(function() {
 		form.find("input[name=theaterName]").val(row.data("theater-name"));
 		form.find("input[name=screenOpen]").val(row.data("screen-open"));
 		form.find("input[name=screenEnd]").val(row.data("screen-end"));
+		
+		form.find("input[name=screenEnd]").val(row.data("screen-end"));
+		
 		form.find("input[name=screenDate]").val(selectedDate);
 		
 		form.submit();
