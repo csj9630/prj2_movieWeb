@@ -555,7 +555,7 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
     </main>
 
     <!-- 푸터 -->
-    <div id="footer"><%@ include file="../../fragments/footer.jsp" %></div>
+    <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
 
     <script>
       // 탭 전환 기능
