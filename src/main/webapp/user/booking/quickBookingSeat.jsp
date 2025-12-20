@@ -1,15 +1,87 @@
+<%@page import="seat.booking.SeatBookDTO"%>
 <%@page import="seat.booking.SeatBookService"%>
-<%@page import="movie.MovieDTO"%>
+<%-- <%@page import="movie.MovieDTO"%> --%>
 <%@page import="java.util.List"%>
-<%@page import="movie.MovieService"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%-- <%@page import="movie.MovieService"%> --%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <%
+/*ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ*/
+ request.setCharacterEncoding("UTF-8");
+
+String movieCode=request.getParameter("movieCode");
+String movieName=request.getParameter("movieName");
+String screenCode=request.getParameter("screenCode");
+String theaterName=request.getParameter("theaterName");
+String screenOpen=request.getParameter("screenOpen");
+String screenEnd=request.getParameter("screenEnd");
+String screenDate=request.getParameter("screenDate");
+String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠㅠ..
+MovieService ms=MovieService.getInstance();
+String imgPath=ms.showMainImage(movieCode);
+request.setAttribute("imgPath", imgPath);
+System.out.println(movieCode); 
+/*ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */
+
+ /* String movieCode = "mc001";
+String movieName = "극장판 체인소맨 : 레제편";
+String screenCode = "scc001";
+String theaterName = "1상영관";
+String screenOpen = "09:00";
+String screenEnd = "11:30";
+String screenDate = "2025-12-20";
+String theaterNum = "tn002";//////////////////////
+String imgPath = "${commonURL}/resources/images/chain.jpg";
+request.setAttribute("imgPath", imgPath);  */
+
+
+/* 임시로 값 넣어주기 */
 SeatBookService sbs = SeatBookService.getInstance();
-String screen_code="scc001";
-sbs.searchRestaurant(screen_code);
+String screen_code = "scc001";
+
+/* 할인 정보(경로, 청소년, 조조, 심야) 기반으로 총 가격 및 할인 코드 추출하기 */
+//screenOpen (예: "09:00")에서 시간만 추출
+int openHour = Integer.parseInt(screenOpen.split(":")[0]);
+String discountType = "일반"; // 기본값
+
+if (openHour < 10) {
+    discountType = "조조"; // 10시 이전
+} else if (openHour >= 22) {
+    discountType = "심야"; // 22시 이후
+}
+// 기본 티켓 가격 (할인 전 원가)
+int defaultTicketPrice = 15000;
+
+
+
+
+
+
+
+
+
+
+//예약된 좌석들 이름(A1, A2형식)
+List<SeatBookDTO> reservedList = sbs.searchRestaurant(screen_code);
+session.setAttribute("reservedList", reservedList); // 좌석 정보를 세션에 저장하여 다음 페이지에서 사용.
+//reservedList = 예약된 좌석들을 List에 담고, 그걸 배열로 담아서 사용.
+String[] reservedSeats = new String[0];
+if (reservedList != null) {
+	reservedSeats = new String[reservedList.size()];
+	for (int i = 0; i < reservedList.size(); i++) {
+		reservedSeats[i] = reservedList.get(i).getSeat_name();
+	}
+}
 %>
+
+
+<%
+
+%>
+
 <%@ include file="../../fragments/siteProperty.jsp"%>
+<%@ include file="../../fragments/loginChk.jsp"%>
 <html lang="en" data-bs-theme="auto">
 <head>
 <meta charset="UTF-8">
@@ -462,6 +534,7 @@ body {
 .hidden {
 	display: none !important;
 }
+
 .selected-seat-box.filled {
 	background-color: #503396 !important;
 	color: #fff !important;
@@ -470,11 +543,11 @@ body {
 }
 </style>
 <script type="text/javascript">
+	// 인원 저장을 위한 변수
+	let adultCnt = 0;
+	let youthCnt = 0;
+	let seniorCnt = 0;
 	$(function() {
-		// 인원 저장을 위한 변수
-		let adultCnt = 0;
-		let youthCnt = 0;
-		let seniorCnt = 0;
 
 		// 플러스 버튼 클릭
 		$(".btn-plus").click(function() {
@@ -518,45 +591,130 @@ body {
 			updateCount();
 		});
 
+		
+		// 할인 비율 정하기
+		const currentDiscountType = "<%= discountType %>";
+	    const defaultPrice = <%= defaultTicketPrice %>;
+
+	    // 할인 코드
+	    const discountInfo = {
+	        "조조": { 
+	            "adult": { rate: 0.6, code: "dc002" }, 
+	            "youth": { rate: 0.5, code: "dc001" }, 
+	            "senior": { rate: 0.4, code: "dc003" } 
+	        },
+	        "일반": { 
+	            "adult": { rate: 1.0, code: "dc005" }, 
+	            "youth": { rate: 0.7, code: "dc004" }, 
+	            "senior": { rate: 0.6, code: "dc006" } 
+	        },
+	        "심야": { 
+	            "adult": { rate: 0.7, code: "dc008" }, 
+	            "youth": { rate: 0.6, code: "dc007" }, 
+	            "senior": { rate: 0.5, code: "dc009" } 
+	        }
+	    };
+		
+		
 		// 인원 UI 업데이트 함수
 		function updateCount() {
-		    $("#adult-count").text(adultCnt);
-		    $("#youth-count").text(youthCnt);
-		    $("#senior-count").text(seniorCnt);
+        $("#adult-count").text(adultCnt);
+        $("#youth-count").text(youthCnt);
+        $("#senior-count").text(seniorCnt);
 
-		    let total = adultCnt + youthCnt + seniorCnt;
-		    $("#price-summary-text").text("총 " + total + "명");
+        let total = adultCnt + youthCnt + seniorCnt;
+        $("#price-summary-text").text("총 " + total + "명 (" + currentDiscountType + ")");
 
-		    // 인원을 줄였을 때 초과된 좌석 선택 해제하기
-		    let $selectedSeats = $(".seat.selected");
-		    if ($selectedSeats.length > total) {
-		        // 선택된 좌석들 중 인원수를 초과하는 만큼(뒤에서부터) 선택 해제
-		        for (let i = $selectedSeats.length - 1; i >= total; i--) {
-		            $($selectedSeats[i]).removeClass("selected").addClass("available");
-		        }
-		    }
+        // --- 할인 계산 ---
+        let totalPrice = 0;
+        let discountCodes = [];
+        let policy = discountInfo[currentDiscountType];
 
-		    // 금액 업데이트
-		    let totalPrice = total * 12000; 
-		    $("#total-price").html(totalPrice.toLocaleString() + "<span>원</span>");
+        // 성인(adult) 합산
+        for(let i=0; i<adultCnt; i++) {
+            totalPrice += (defaultPrice * policy.adult.rate);
+            discountCodes.push(policy.adult.code);
+        }
+        // 청소년(youth) 합산 
+        for(let i=0; i<youthCnt; i++) {
+            totalPrice += (defaultPrice * policy.youth.rate);
+            discountCodes.push(policy.youth.code);
+        }
+        // 경로(senior) 합산
+        for(let i=0; i<seniorCnt; i++) {
+            totalPrice += (defaultPrice * policy.senior.rate);
+            discountCodes.push(policy.senior.code);
+        }
+        // 할인된 금액 출력
+        $("#total-price").html(totalPrice.toLocaleString() + "<span>원</span>");
+        // 할인 parameter에 넣어주기.
+        $("#totalPrice").val(totalPrice);
+        // 할인 코드 리스트를 hidden 필드에 저장
+        $("#discountCodeList").val(discountCodes.join(","));
+        // ---------------------------------------------
 
-		    // 인원 선택 여부에 따른 오버레이 제어
-		    if (total > 0) {
-		        $("#seat-map-overlay").hide();
-		    } else {
-		        // 인원을 0으로 만들면 모든 좌석 선택 해제
-		        $(".seat.selected").removeClass("selected").addClass("available");
-		        $("#seat-map-overlay").show();
-		    }
+        // 인원 초과 좌석 해제
+        let $selectedSeats = $(".seat.selected");
+        if ($selectedSeats.length > total) {
+            for (let i = $selectedSeats.length - 1; i >= total; i--) {
+                $($selectedSeats[i]).removeClass("selected").addClass("available");
+            }
+        }
 
-		    // 우측 사이드바 정보 갱신
-		    renderSelectedSeats();
-		}
+        if (total > 0) {
+            $("#seat-map-overlay").hide();
+        } else {
+            $(".seat.selected").removeClass("selected").addClass("available");
+            $("#seat-map-overlay").show();
+        }
+        renderSelectedSeats();
+    }
 
 		// 다음 버튼 클릭 -> 모달 오픈
-		$("#next-button").click(function() {
-			$("#alert-modal-booking").removeClass("hidden");
-		});
+		$("#next-button").click(
+				function() {
+
+					//인원 선택 유효성 검사 체크
+					if (!checkBooking()) {
+						return;
+					}
+					//선택된 좌석 이름 수집 (예: ["A1", "A2"])
+					let selectedSeatNames = [];
+					$(".seat.selected").each(
+							function() {
+								let row = $(this).closest(".seat-row").find(
+										".row-label").text();
+								let col = $(this).text();
+								selectedSeatNames.push(row + col);
+							});
+
+					// hidden input에 값 설정 (콤마로 구분된 문자열)
+					$("#selectedSeatNames").val(selectedSeatNames.join(","));
+					$("#theaterNum").val("<%=theaterNum%>");
+					$("#screenCode").val("<%=screenCode%>");
+					
+					//유효성 검사 통과 후 예약된 좌석인지 확인하기 위해 ajax를 위한 process.jsp로 form값 넘겨주기
+					var inputCode = $("#submitFrm").serialize();
+					$.ajax({
+				        url : 'checkSeatProcess.jsp', // 중복 체크 전용 JSP
+				        type : 'POST',
+				        dataType : 'json',
+				        data : inputCode, // 현재 폼 데이터를 그대로 전송
+				        success : function(response) {
+				            if (response.status === 'success') {
+				                // 중복이 없다면 예약 확인 모달창 띄움
+				                $("#alert-modal-booking").removeClass("hidden");
+				            } else {
+				                // 누군가 이미 예약했다면 알림창 띄우고 페이지 새로고침
+				                alert(response.message);
+				                location.reload(); 
+				            }
+				        },
+				        error : function() {
+				            alert('좌석 확인 중 오류가 발생했습니다.');
+				        }
+				    });
+				});
 
 		// 모달 닫기 (취소 및 X 버튼)
 		$(".close-modal").click(function() {
@@ -564,15 +722,44 @@ body {
 		});
 
 		// 모달 확인 버튼 (페이지 이동)
-		$("#btn-confirm-move").click(function() {
-			location.href = "${commonURL}/user/payment/paymentFrm.jsp";
-		});
+		//결제 확인 창에서 확인 버튼을 누르면 ajax로 결제 정보를 DB에 입력. 실패 시 새로고침 없이 실패했다고 보여줌.
+		$("#btn-confirm-move").click(
+				function() {
+					//사용자가 입력한 코드 값 한번에 넘기기
+					var inputCode = $("#submitFrm").serialize();
+
+					$.ajax({
+						url : 'quickBookingSeatProcess.jsp', // AJAX 요청 대상 JSP 파일
+						type : 'POST',
+						dataType : 'json', // 서버의 응답을 JSON 형식으로 예상
+						data : inputCode,
+						success : function(responseJSON) {
+							if (responseJSON.status === 'success') {
+								//예매 성공시 결제 페이지로
+								location.href = "${commonURL}/user/payment/paymentFrm.jsp";
+							} else if (responseJSON.status === 'fail') {
+								alert("예약 저장에 실패했습니다: " + responseJSON.message);
+				                $("#alert-modal-booking").addClass("hidden"); // 모달 닫기
+							} 
+						},
+						error : function(error) {
+							console.error("Error: " + error);
+				            alert('서버 통신에 실패했습니다. 다시 시도해주세요.');
+						}
+					});
+
+				});
 
 		// 좌석 맵 생성 함수
 		function createSeatMap() {
 			const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";//좌석번호
-			const reservedSeats = [ 'A5', 'A6', 'D10', 'E4', 'E5', 'J8', 'J9',
-					'J10' ];//예약 좌석
+			const reservedSeats = [
+<%if (reservedSeats != null) {
+	for (int i = 0; i < reservedSeats.length; i++) {
+		out.print("'" + reservedSeats[i] + "'" + (i < reservedSeats.length - 1 ? "," : ""));
+	}
+}%>
+	];//예약 좌석
 			const rows = 10;//행
 			const cols = 10;//열
 			const aisles = [ 2, 8 ];//통로
@@ -589,7 +776,7 @@ body {
 							+ (isReserved ? 'reserved' : 'available') + '">'
 							+ c + '</button>');
 					//예약 좌석인지 확인
-					if (isReserved){
+					if (isReserved) {
 						$seat.prop("disabled", true);
 					}//end if
 					//좌석 추가
@@ -604,7 +791,7 @@ body {
 		}
 		// 초기 실행
 		createSeatMap();
-		
+
 		// 좌석 클릭 이벤트
 		$(document).on("click", ".seat.available, .seat.selected", function() {
 			let total = adultCnt + youthCnt + seniorCnt;
@@ -633,53 +820,68 @@ body {
 			}
 
 			// 선택된 좌석(.selected)을 찾아서 순서대로 채움
-			$(".seat.selected").each(function(index) {
-				let row = $(this).closest(".seat-row").find(".row-label").text();
-				let col = $(this).text();
-				let seatNum = row + col;
+			$(".seat.selected").each(
+					function(index) {
+						let row = $(this).closest(".seat-row").find(
+								".row-label").text();
+						let col = $(this).text();
+						let seatNum = row + col;
 
-				if (index < 6) {
-					$("#selectSeat" + (index + 1)).text(seatNum).addClass("filled");
-				}
-			});
+						if (index < 6) {
+							$("#selectSeat" + (index + 1)).text(seatNum)
+									.addClass("filled");
+						}
+					});
 		}
-		
-		
+
 	});//ready
+	//"다음"버튼 클릭시 인원 유효성 검사
+	function checkBooking() {
+		let total = adultCnt + youthCnt + seniorCnt;
+		if ($(".seat.selected").length < total) {
+			alert("관람인원을 전부 체크 해주세요.");
+			return false;
+		} else if ($(".seat.selected").length == 0) {
+			alert("관람인원을 설정해주세요.");
+			return false;
+		}
+		return true;
+	}//checkBooking
 </script>
 </head>
 <body>
-    <header id="header"><jsp:include page="../../fragments/header.jsp" /></header>
+	<!-- quickBookingSeatProcess.jsp으로 Parameter를 보내기 위한 form -->
+	<form name="submitFrm" id="submitFrm"
+		action="quickBookingSeatProcess.jsp" method="post">
+		<input type="hidden" name="movieCode" id="movieCode" value="">
+		<input type="hidden" name="movieName" id="movieName" value="">
+		<input type="hidden" name="screenCode" id="screenCode" value="">
+		<input type="hidden" name="theaterName" id="theaterName" value="">
+		<input type="hidden" name="screenOpen" id="screenOpen" value="">
+		<input type="hidden" name="screenEnd" id="screenEnd" value="">
+		<input type="hidden" name="screenDate" id="screenDate" value="">
+		<input type="hidden" name="theaterNum" id="theaterNum" value="">
+		<input type="hidden" name="imgPath" id="imgPath" value=""> 
+		<input type="hidden" name="selectedSeatNames" id="selectedSeatNames" value="">
+		<input type="hidden" name="discountCodeList" id="discountCodeList" value="">
+		<input type="hidden" name="totalPrice" id="totalPrice" value="">
+		
+	</form>
 
-    <div class="page-util">
-        <div class="inner-wrap">
-            <div class="location">
-                <span>Home</span>
-                <a href="#" title="회원">예매</a>
-                <a href="#">빠른 예매</a>
-            </div>
-        </div>
-    </div>
+	<header id="header"><jsp:include
+			page="../../fragments/header.jsp" /></header>
 
-	<%
-	request.setCharacterEncoding("UTF-8");
-	
-	String movieCode=request.getParameter("movieCode");
-	String movieName=request.getParameter("movieName");
-	String screenCode=request.getParameter("screenCode");
-	String theaterName=request.getParameter("theaterName");
-	String screenOpen=request.getParameter("screenOpen");
-	String screenEnd=request.getParameter("screenEnd");
-	String screenDate=request.getParameter("screenDate");
-	
-	MovieService ms=MovieService.getInstance();
-	String imgPath=ms.showMainImage(movieCode);
-	
-	request.setAttribute("imgPath", imgPath);
-	System.out.println(movieCode);
-	%>
+	<div class="page-util">
+		<div class="inner-wrap">
+			<div class="location">
+				<span>Home</span> <a href="#" title="회원">예매</a> <a href="#">빠른
+					예매</a>
+			</div>
+		</div>
+	</div>
 
-	<div class="booking-container">
+
+
 
 	<div class="booking-container">
 		<div class="main-content">
@@ -727,14 +929,15 @@ body {
 		<div class="sidebar">
 			<div class="sidebar-content">
 				<div class="movie-info">
-					<img src="${commonURL}/${movieImgPath}/<%= movieCode %>/${imgPath}" alt="<%= movieName %> 포스터">
+					<img src="${commonURL}/${movieImgPath}/<%= movieCode %>/${imgPath}"
+						alt="<%= movieName %> 포스터">
 					<div>
 						<h4>
-							 <span style="color:#fff;"><%= movieName %></span>
+							<span style="color: #fff;"><%=movieName%></span>
 						</h4>
-						<p><%= theaterName %></p>
-						<p><%= screenDate %></p>
-						<span style="color: #FFF"><%= screenOpen %>~<%= screenEnd %></span>
+						<p><%=theaterName%></p>
+						<p><%=screenDate%></p>
+						<span style="color: #FFF"><%=screenOpen%>~<%=screenEnd%></span>
 					</div>
 				</div>
 				<div class="legend">
@@ -798,7 +1001,8 @@ body {
 
 
 
-	<footer id="footer"><jsp:include
-			page="../../fragments/footer.jsp" /></footer>
+	<footer id="footer">
+		<jsp:include page="../../fragments/footer.jsp"></jsp:include>
+	</footer>
 </body>
 </html>
