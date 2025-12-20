@@ -22,9 +22,9 @@
     }
 
     MovieWithdrawService service = MovieWithdrawService.getInstance();
-    boolean isSuccess = service.updatePassword(userId, newPass);
+    int result = service.updatePassword(userId, newPass);
 
-    if(isSuccess) {
+    if(result == 1) { // 성공
 		session.invalidate(); // 비밀번호 변경 후 로그아웃 처리
 %>
     <script>
@@ -32,10 +32,17 @@
         location.href = "${commonURL}/user/main/index.jsp"; 
     </script>
 <%
-    } else {
+    } else if(result == -1) { // 기존 비밀번호와 동일
 %>
     <script>
-        alert("비밀번호 변경에 실패했습니다.");
+        alert("현재 사용중인 비밀번호와 동일합니다. 다른 비밀번호를 입력해주세요.");
+        history.back();
+    </script>
+<%
+    } else { // 실패 (0)
+%>
+    <script>
+        alert("비밀번호 변경에 실패했습니다. 관리자에게 문의하세요.");
         history.back();
     </script>
 <%

@@ -1,4 +1,5 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 <!-- 세션 아이디 : userId      세션 네임 : userName -->
 
 <!-- 미 인증 사용자(userId 부재): 로그인이 필요한 페이지에 대해 접근 시 로그인 페이지로 강제 리다이렉트. -->

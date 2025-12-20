@@ -91,11 +91,12 @@ public class MovieWithdrawService {
 		return false;
 	}
 
-    public boolean updatePassword(String id, String newPass) {
+    public int updatePassword(String id, String newPass) {
     	// 비밀번호 암호화 (SHA-1)
+    	String hashedPass = "";
     	if(newPass != null && !newPass.isEmpty()) {
     		try {
-    			newPass = DataEncryption.messageDigest("SHA-1", newPass);
+    			hashedPass = DataEncryption.messageDigest("SHA-1", newPass);
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 			}
@@ -103,11 +104,21 @@ public class MovieWithdrawService {
     	
         MovieWithdrawDAO dao = MovieWithdrawDAO.getInstance();
         try {
-            return dao.updatePass(id, newPass) > 0;
+        	// 기존 비밀번호 확인 (중복 방지)
+        	MovieWithdrawDTO userInfo = dao.selectUser(id);
+        	if(userInfo != null) {
+        		String currentPass = userInfo.getUsers_pass();
+        		if(currentPass != null && currentPass.equals(hashedPass)) {
+        			return -1; // 기존 비밀번호와 동일함
+        		}
+        	}
+        	
+            // 변경 진행
+        	return dao.updatePass(id, hashedPass); // 성공 시 1, 실패 시 0
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return 0; // SQL 오류 등실패
     }
 
     public boolean withdrawUser(String id) {
