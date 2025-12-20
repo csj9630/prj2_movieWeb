@@ -21,7 +21,7 @@
 			%>
 			<div class="after">
 				<a href="${commonURL}/user/memberLogin.jsp" class="" title=""><%=userName%>님</a>
-				<a href="logout.jsp" title="로그아웃">로그아웃</a>
+				<a href="${commonURL}/user/member/logout.jsp" title="로그아웃">로그아웃</a>
 			</div>
 			<%
 			} else {
