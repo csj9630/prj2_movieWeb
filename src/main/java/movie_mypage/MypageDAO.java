@@ -58,7 +58,7 @@ public class MypageDAO {
                .append("FROM BOOK b ")
                .append("JOIN SCREEN_INFO s ON b.screen_code = s.screen_code ")
                .append("WHERE b.users_id = ? ")
-               .append("AND b.book_state = 'T' ")
+               .append("AND b.book_state = '결제완료' ")
                .append("AND s.screen_date < SYSDATE");
             
             pstmt = con.prepareStatement(sql.toString());
@@ -154,7 +154,7 @@ public class MypageDAO {
                .append("JOIN MOVIE m ON s.movie_code = m.movie_code ")
                .append("JOIN THEATHER_INFO t ON s.theather_num = t.theather_num ")
                .append("WHERE b.users_id = ? ")
-               .append("AND b.book_state = 'T' ")
+               .append("AND b.book_state = '결제완료' ")
                // 상영일이 오늘 이후인 예매 (앞으로 볼 영화)
                .append("AND s.screen_date >= TRUNC(SYSDATE) ")
                // 예매일이 최근 N일 이내
