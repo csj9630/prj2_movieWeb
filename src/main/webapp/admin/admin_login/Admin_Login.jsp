@@ -6,6 +6,7 @@
     <title>2GV Admin Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <style>
         /* [초기화] */
@@ -51,7 +52,7 @@
             filter: drop-shadow(5px 5px 10px rgba(0,0,0,0.1));
         }
 
-        /* [3. 하단 장식 이미지 (New!)] */
+        /* [3. 하단 장식 이미지] */
         .deco-img {
             position: absolute;
             bottom: 0;
@@ -63,13 +64,10 @@
 
         .deco-left {
             left: 0;
-            /* 이미지가 너무 딱 붙지 않게 위치 미세 조정 가능 */
-            /* transform: translate(-10%, 10%); */
         }
 
         .deco-right {
             right: 0;
-            /* transform: translate(10%, 10%); */
         }
 
 
@@ -89,18 +87,25 @@
         .login-footer a:hover { color: #503396; }
 
     </style>
+    
+    <script type="text/javascript">
+    $(function(){
+        // 엔터키 입력 시 로그인 버튼 클릭 처리
+        $(".input-field").keydown(function(evt){
+            if(evt.which == 13){
+                $("#loginFrm").submit();
+            }
+        });
+    });
+    </script>
 </head>
 <body>
 
-    <!-- [하단 장식 이미지 추가] -->
-    <!-- 왼쪽 하단 이미지 -->
     <img src="../../resources/img/deco_left.png" class="deco-img deco-left" alt="deco">
     
-    <!-- 오른쪽 하단 이미지 -->
     <img src="../../resources/img/deco_right.png" class="deco-img deco-right" alt="deco">
 
 
-    <!-- [로그인 컨테이너] -->
     <div class="login-card">
         
         <div class="top-logo-area">
@@ -111,15 +116,15 @@
             <h2 class="login-title">관리자 로그인</h2>
         </div>
 
-        <form action="../admin_dashboard/Admin_Dashboard.jsp" method="post">
+        <form action="admin_login_process.jsp" method="post" id="loginFrm">
             <div class="input-group">
                 <i class="fa-solid fa-user input-icon"></i>
-                <input type="text" name="adminId" class="input-field" placeholder="Admin ID" required autocomplete="off">
+                <input type="text" name="id" class="input-field" placeholder="Admin ID" required autocomplete="off">
             </div>
 
             <div class="input-group">
                 <i class="fa-solid fa-lock input-icon"></i>
-                <input type="password" name="adminPass" class="input-field" placeholder="Password" required>
+                <input type="password" name="pass" class="input-field" placeholder="Password" required>
             </div>
 
             <button type="submit" class="login-btn">LOGIN</button>

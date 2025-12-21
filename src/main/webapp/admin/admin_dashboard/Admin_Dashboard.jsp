@@ -1,6 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
+<%
+    // [세션 검사] 로그인 안 된 상태면 로그인 화면으로 튕겨냄
+    String adminId = (String) session.getAttribute("adminId");
+    if (adminId == null) {
+%>
+    <script>
+        alert("로그인이 필요한 서비스입니다.");
+        location.href = "../admin_login/Admin_Login.jsp";
+    </script>
+<%
+        return; // 밑에 있는 HTML이나 자바 코드가 실행되지 않도록 여기서 멈춤
+    }
+%>
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -464,15 +476,14 @@ input, select {
 		</div>
 
 		<div class="sidebar-footer">
-
-			<div class="admin-avatar">AD</div>
-
-			<div class="admin-info">
-				<h4>최고관리자</h4>
-				<p>Super Admin</p>
-			</div>
-
-		</div>
+    <div class="admin-avatar">
+        <%= adminId != null && adminId.length() >= 2 ? adminId.substring(0, 2).toUpperCase() : "AD" %>
+    </div>
+    <div class="admin-info">
+        <h4><%= adminId %></h4>
+        <p>Admin Account</p>
+    </div>
+</div>
 
 	</nav>
 
@@ -488,8 +499,7 @@ input, select {
 
 			<div class="header-right">
 
-				<button class="logout-btn"
-					onclick="location.href='../admin_login/Admin_Login.jsp'">로그아웃</button>
+				<button class="logout-btn" onclick="location.href='../admin_login/admin_logout.jsp'">로그아웃</button>
 
 			</div>
 

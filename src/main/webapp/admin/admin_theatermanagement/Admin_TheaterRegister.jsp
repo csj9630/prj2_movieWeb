@@ -1,4 +1,41 @@
+<%@page import="movie.theater_admin.SeatDTO"%>
+<%@page import="movie.theater_admin.TheaterDTO"%>
+<%@page import="java.util.List"%>
+<%@page import="movie.admin.AdminTheaterService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    // [세션 검사] 로그인 안 된 상태면 로그인 화면으로 튕겨냄
+    String adminId = (String) session.getAttribute("adminId");
+    if (adminId == null) {
+%>
+    <script>
+        alert("로그인이 필요한 서비스입니다.");
+        location.href = "../admin_login/Admin_Login.jsp";
+    </script>
+<%
+        return; // 밑에 있는 HTML이나 자바 코드가 실행되지 않도록 여기서 멈춤
+    }
+%>
+<%
+	request.setCharacterEncoding("UTF-8");
+	
+	String id = request.getParameter("id");
+	String mode = "insert";
+	TheaterDTO tDTO = null;
+	List<SeatDTO> seatList = null;
+	
+	if(id != null && !id.equals("")){
+		mode = "update";
+		AdminTheaterService as = AdminTheaterService.getInstance();
+		tDTO = as.getTheater(id);
+		seatList = as.getSeatList(id);
+	}
+	
+	pageContext.setAttribute("mode", mode);
+	pageContext.setAttribute("tDTO", tDTO);
+	pageContext.setAttribute("seatList", seatList);
+%>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,24 +43,15 @@
     <title>2GV Admin - 상영관 관리</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
     <style>
-        /* [1. 공통 스타일 유지] */
         * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-        body {
-            font-family: 'Noto Sans KR', sans-serif;
-            background-color: #f5f6fa;
-            color: #333;
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f5f6fa; color: #333; display: flex; height: 100vh; overflow: hidden; }
         a { text-decoration: none; color: inherit; }
         ul { list-style: none; }
         button { border: none; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; }
         input, select { font-family: 'Noto Sans KR', sans-serif; }
-
-        /* [2. 사이드바] */
         .sidebar { width: 260px; background-color: #1e1e2d; color: #a2a3b7; display: flex; flex-direction: column; flex-shrink: 0; transition: all 0.3s; }
         .logo-area { height: 80px; display: flex; align-items: center; justify-content: center; background-color: #1b1b28; border-bottom: 1px solid #2d2d3f; }
         .logo-area img { height: 45px; object-fit: contain; display: block; }
@@ -37,8 +65,6 @@
         .admin-avatar { width: 40px; height: 40px; background-color: #503396; border-radius: 50%; display: flex; justify-content: center; align-items: center; color: #fff; font-weight: bold; font-size: 14px; }
         .admin-info h4 { font-size: 14px; color: #fff; font-weight: 500; margin-bottom: 2px; }
         .admin-info p { font-size: 12px; color: #727589; }
-
-        /* [3. 메인 컨텐츠] */
         .main-content { flex: 1; display: flex; flex-direction: column; min-width: 0; }
         .top-header { height: 80px; background-color: #ffffff; border-bottom: 1px solid #e1e1e1; display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .header-left-title h2 { font-size: 24px; font-weight: 800; color: #1e1e2d; margin-bottom: 4px; letter-spacing: -0.5px; }
@@ -46,99 +72,31 @@
         .header-right { display: flex; align-items: center; gap: 20px; margin-left: 20px; }
         .logout-btn { padding: 8px 16px; border: 1px solid #e1e1e1; background-color: #fff; border-radius: 6px; font-size: 12px; font-weight: 600; color: #5e6278; transition: 0.2s; }
         .logout-btn:hover { background-color: #f9f9f9; border-color: #d1d1d1; color: #333; }
-        
         .content-wrapper { flex: 1; padding: 40px 30px; overflow-y: auto; }
-
-        /* [4. 폼 컨테이너 스타일 (수정됨: 상하 배치)] */
-        .form-container {
-            background: #fff; border-radius: 12px; padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.03); 
-            max-width: 900px; margin: 0 auto;
-            display: flex; flex-direction: column; /* 세로 배치 */
-        }
-
-        /* [4-1. 상단 입력 폼 (Grid 적용)] */
-        .input-section {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3열 그리드 */
-            gap: 20px;
-            padding-bottom: 30px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 30px;
-        }
-
-        /* 사운드 시스템과 사용여부는 한 줄에 꽉 차게 */
-        .input-row-wide {
-            grid-column: span 3; /* 3칸 차지 */
-            display: flex; gap: 20px;
-        }
+        
+        .form-container { background: #fff; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; }
+        .input-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-bottom: 30px; border-bottom: 1px solid #eee; margin-bottom: 30px; }
+        .input-row-wide { grid-column: span 3; display: flex; gap: 20px; }
         .half-width { flex: 1; }
-
-        .form-group { margin-bottom: 0; } /* 그리드라 마진 제거 */
+        .form-group { margin-bottom: 0; }
         .form-label { display: block; font-size: 14px; font-weight: 700; color: #333; margin-bottom: 8px; }
-        
-        .form-input, .form-select {
-            width: 100%; height: 45px; padding: 0 15px;
-            border: 1px solid #ddd; border-radius: 6px;
-            font-size: 14px; color: #555; background-color: #fff;
-        }
-        .form-input:read-only {
-            background-color: #f9f9f9; color: #888; cursor: default; border-color: #e1e1e1;
-        }
+        .form-input, .form-select { width: 100%; height: 45px; padding: 0 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px; color: #555; background-color: #fff; }
+        .form-input:read-only { background-color: #f9f9f9; color: #888; cursor: default; border-color: #e1e1e1; }
         .form-input:focus, .form-select:focus { border-color: #503396; }
-
-        /* [4-2. 하단 좌석 배치도 (중앙 정렬)] */
-        .seat-section {
-            display: flex; flex-direction: column; align-items: center;
-            width: 100%;
-        }
+        
+        .seat-section { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .seat-map-title { font-size: 16px; font-weight: 700; margin-bottom: 15px; color: #1e1e2d; }
-        
-        .screen {
-            width: 600px; height: 35px; 
-            background: linear-gradient(to bottom, #ddd, #fff); /* 스크린 느낌 */
-            border: 1px solid #ccc;
-            margin-bottom: 40px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 14px; color: #555; border-radius: 4px; font-weight: 800; letter-spacing: 2px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-        }
-
-        .seat-grid {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr); /* 10열 */
-            gap: 10px;
-        }
-        
-        .seat {
-            width: 40px; height: 40px;
-            background-color: #503396; /* 사용가능 */
-            border-radius: 8px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 12px; color: #fff; font-weight: 600;
-            cursor: pointer; transition: 0.2s;
-            box-shadow: 0 2px 5px rgba(80, 51, 150, 0.3);
-        }
+        .screen { width: 600px; height: 35px; background: linear-gradient(to bottom, #ddd, #fff); border: 1px solid #ccc; margin-bottom: 40px; display: flex; justify-content: center; align-items: center; font-size: 14px; color: #555; border-radius: 4px; font-weight: 800; letter-spacing: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+        .seat-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 10px; }
+        .seat { width: 40px; height: 40px; background-color: #503396; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 12px; color: #fff; font-weight: 600; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 5px rgba(80, 51, 150, 0.3); }
         .seat:hover { transform: scale(1.1); }
+        .seat.disabled { background-color: #e0e0e0; color: #999; box-shadow: none; }
         
-        /* 비활성 좌석 스타일 */
-        .seat.disabled { 
-            background-color: #e0e0e0; color: #999; 
-            box-shadow: none;
-        }
-
-
-        /* [5. 하단 버튼] */
-        .form-actions {
-            width: 100%;
-            display: flex; justify-content: center; gap: 10px; margin-top: 40px; 
-            padding-top: 20px; border-top: 1px solid #eee;
-        }
+        .form-actions { width: 100%; display: flex; justify-content: center; gap: 10px; margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; }
         .btn-save { background-color: #503396; color: #fff; padding: 12px 30px; border-radius: 6px; font-weight: 700; transition: 0.2s; font-size: 15px; }
         .btn-save:hover { background-color: #3e257a; }
         .btn-cancel { background-color: #fff; border: 1px solid #ddd; color: #555; padding: 12px 30px; border-radius: 6px; font-weight: 600; transition: 0.2s; font-size: 15px; }
         .btn-cancel:hover { background-color: #f9f9f9; }
-
     </style>
 </head>
 <body>
@@ -166,9 +124,14 @@
             </ul>
         </div>
         <div class="sidebar-footer">
-            <div class="admin-avatar">AD</div>
-            <div class="admin-info"><h4>최고관리자</h4><p>Super Admin</p></div>
-        </div>
+    <div class="admin-avatar">
+        <%= adminId != null && adminId.length() >= 2 ? adminId.substring(0, 2).toUpperCase() : "AD" %>
+    </div>
+    <div class="admin-info">
+        <h4><%= adminId %></h4>
+        <p>Admin Account</p>
+    </div>
+</div>
     </nav>
 
     <main class="main-content">
@@ -177,22 +140,24 @@
                 <h2>상영관 등록/수정</h2>
                 <p>상영관의 상세 정보를 수정하고 좌석을 관리합니다.</p>
             </div>
-            <div class="header-right"><button class="logout-btn" onclick="location.href='../admin_login/Admin_Login.jsp'">로그아웃</button></div>
+            <div class="header-right"><button class="logout-btn" onclick="location.href='../admin_login/admin_logout.jsp'">로그아웃</button></div>
         </header>
 
         <div class="content-wrapper">
-            
             <div class="form-container">
                 <form id="theaterForm">
+                    <input type="hidden" id="mode" value="${ mode }">
                     
                     <div class="input-section">
                         <div class="form-group">
                             <label class="form-label">상영관 ID</label>
-                            <input type="text" id="theaterId" class="form-input" readonly>
+                            <input type="text" id="theaterId" class="form-input" 
+                            	value="${ tDTO.theatherNum }" ${ mode eq 'update' ? 'readonly' : '' } 
+                            	placeholder="예: tn001">
                         </div>
                         <div class="form-group">
                             <label class="form-label">상영관 이름</label>
-                            <input type="text" id="theaterName" class="form-input" readonly>
+                            <input type="text" id="theaterName" class="form-input" value="${ tDTO.theatherName }" placeholder="예: 1상영관">
                         </div>
                         <div class="form-group">
                             <label class="form-label">총 좌석 수</label>
@@ -203,17 +168,16 @@
                             <div class="form-group half-width">
                                 <label class="form-label">사운드 시스템</label>
                                 <select class="form-select" id="soundSystem">
-                                    <option value="Dolby Digital 7.1">Dolby Digital 7.1</option>
-                                    <option value="Dolby Atmos">Dolby Atmos</option>
-                                    <option value="DTS Digital Surround">DTS Digital Surround</option>
-                                    <option value="Meyer Sound">Meyer Sound</option>
+                                    <option value="tn001" ${ tDTO.soundCode eq 'tn001' ? 'selected' : '' }>Dolby Digital 7.1</option>
+                                    <option value="tn002" ${ tDTO.soundCode eq 'tn002' ? 'selected' : '' }>DTS Digital Surround</option>
+                                    <option value="tn003" ${ tDTO.soundCode eq 'tn003' ? 'selected' : '' }>Dolby Atmos</option>
                                 </select>
                             </div>
                             <div class="form-group half-width">
                                 <label class="form-label">사용 가능 여부</label>
                                 <select class="form-select" id="isAvailable">
-                                    <option value="사용중">사용중</option>
-                                    <option value="미사용중">미사용중</option>
+                                    <option value="T" ${ tDTO.availability eq 'T' ? 'selected' : '' }>사용중</option>
+                                    <option value="F" ${ tDTO.availability eq 'F' ? 'selected' : '' }>미사용중</option>
                                 </select>
                             </div>
                         </div>
@@ -226,7 +190,15 @@
                         <div class="seat-grid" id="seatGrid"></div>
                         
                         <div style="margin-top:15px; font-size:13px; color:#888;">
-                            <i class="fa-solid fa-circle-info"></i> 좌석을 클릭하여 <strong>고장/수리중</strong> 상태로 변경할 수 있습니다.
+                            <i class="fa-solid fa-circle-info"></i> 
+                            <c:choose>
+                            	<c:when test="${ mode eq 'update' }">
+                            		좌석을 클릭하여 <strong>고장/수리중</strong> 상태로 변경할 수 있습니다. (즉시 반영)
+                            	</c:when>
+                            	<c:otherwise>
+                            		신규 등록 시 모든 좌석은 '사용 가능' 상태로 생성됩니다.
+                            	</c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
 
@@ -237,51 +209,108 @@
 
                 </form>
             </div>
-
         </div>
     </main>
 
     <script>
+    	const seatData = {};
+    	<c:if test="${ not empty seatList }">
+    		<c:forEach var="s" items="${ seatList }">
+    			seatData['${s.seatCode}'] = '${s.availableSeat}';
+    		</c:forEach>
+    	</c:if>
+    	
+    	const currentMode = "${ mode }";
+    	const theaterIdVal = "${ tDTO.theatherNum }";
+
         window.onload = function() {
-            // URL 파라미터 처리 (id=cinema1)
-            const urlParams = new URLSearchParams(window.location.search);
-            const theaterId = urlParams.get('id');
-
-            if (theaterId) {
-                document.getElementById('theaterId').value = theaterId;
-                const num = theaterId.replace(/[^0-9]/g, "");
-                document.getElementById('theaterName').value = num + "상영관";
-            } else {
-                document.getElementById('theaterId').value = "cinema1";
-                document.getElementById('theaterName').value = "1상영관";
-            }
-
             createSeats();
         };
 
         function createSeats() {
             const grid = document.getElementById('seatGrid');
             const rows = ['A','B','C','D','E','F','G','H','I','J'];
-            
             let html = '';
+            
             rows.forEach(row => {
                 for (let i = 1; i <= 10; i++) {
-                    const seatId = row + i;
-                    html += '<div class="seat" onclick="toggleSeat(this)" title="'+seatId+'">' + seatId + '</div>';
+                	let tempSeatCode = theaterIdVal + "-" + row + i; 
+                	
+                	let statusClass = "seat";
+                	if(currentMode === 'update' && seatData[tempSeatCode] === 'F'){
+                		statusClass += " disabled";
+                	}
+                	
+                    html += '<div class="'+statusClass+'" onclick="toggleSeat(this, \''+tempSeatCode+'\')">' + row + i + '</div>';
                 }
             });
             grid.innerHTML = html;
         }
 
-        function toggleSeat(element) {
-            element.classList.toggle('disabled');
+        function toggleSeat(element, seatCode) {
+        	if(currentMode !== 'update') {
+        		alert("신규 등록 중에는 좌석 상태를 변경할 수 없습니다.\n등록 후 수정 페이지에서 관리해주세요.");
+        		return;
+        	}
+        	
+        	let currentStatus = element.classList.contains('disabled') ? 'F' : 'T';
+        	
+        	$.ajax({
+        		url: "admin_seat_status_process.jsp",
+        		type: "post",
+        		dataType: "json",
+        		data: { 
+        			seatCode: seatCode, 
+        			status: currentStatus 
+        		},
+        		success: function(json){
+        			if(json.result){
+        				element.classList.toggle('disabled');
+        			} else {
+        				alert("좌석 상태 변경 실패");
+        			}
+        		},
+        		error: function(){
+        			alert("서버 통신 오류");
+        		}
+        	});
         }
 
         function saveTheater() {
-            alert('상영관 정보 수정이 완료되었습니다.');
-            location.href = 'Admin_TheaterManagement.jsp';
+        	let id = $("#theaterId").val();
+        	let name = $("#theaterName").val();
+        	let sound = $("#soundSystem").val();
+        	let status = $("#isAvailable").val();
+        	
+        	if(id == "" || name == ""){
+        		alert("필수 정보를 입력해주세요.");
+        		return;
+        	}
+        	
+        	$.ajax({
+        		url: "admin_theater_register_process.jsp",
+        		type: "post",
+        		dataType: "json",
+        		data: {
+        			mode: currentMode,
+        			id: id,
+        			name: name,
+        			sound: sound,
+        			status: status
+        		},
+        		success: function(json){
+        			if(json.result){
+        				alert("저장이 완료되었습니다.");
+        				location.href = "Admin_TheaterManagement.jsp";
+        			} else {
+        				alert("저장에 실패했습니다.");
+        			}
+        		},
+        		error: function(){
+        			alert("서버 통신 오류");
+        		}
+        	});
         }
     </script>
-
 </body>
 </html>
