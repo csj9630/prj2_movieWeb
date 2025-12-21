@@ -153,7 +153,7 @@ public class TheaterDAO {
 			pstmt.close();
 			
 			// 2. 좌석 100개 자동 생성 Insert
-			String insertSeat = "INSERT INTO SEAT(seat_code, seat_row, seat_col, available_seat, theather_num) VALUES (?, ?, ?, 'T', ?)";
+			String insertSeat = "INSERT INTO SEAT(seat_code, seat_row, seat_col, theather_num) VALUES (?, ?, ?, ?)";
 			pstmt = con.prepareStatement(insertSeat);
 			
 			char[] rows = {'A','B','C','D','E','F','G','H','I','J'};
@@ -215,7 +215,7 @@ public class TheaterDAO {
 		
 		try {
 			con = db.getConn();
-			String sql = "SELECT seat_code, seat_row, seat_col, available_seat FROM SEAT WHERE theather_num=? ORDER BY seat_code";
+			String sql = "SELECT seat_code, seat_row, seat_col FROM SEAT WHERE theather_num=? ORDER BY seat_code";
 			pstmt = con.prepareStatement(sql);
 			pstmt.setString(1, theatherNum);
 			rs = pstmt.executeQuery();
@@ -226,9 +226,6 @@ public class TheaterDAO {
 				sDTO.setSeatRow(rs.getString("seat_row"));
 				sDTO.setSeatCol(rs.getString("seat_col"));
 				
-				String av = rs.getString("available_seat");
-				sDTO.setAvailableSeat(av == null ? "T" : av.trim());
-				
 				list.add(sDTO);
 			}
 		} finally {
@@ -237,27 +234,27 @@ public class TheaterDAO {
 		return list;
 	}
 	
-	/**
-	 * 좌석 상태 개별 변경
-	 */
-	public int updateSeatStatus(String seatCode, String status) throws SQLException {
-		int cnt = 0;
-		DbConn db = DbConn.getInstance("jdbc/dbcp");
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		
-		try {
-			con = db.getConn();
-			String sql = "UPDATE SEAT SET available_seat=? WHERE seat_code=?";
-			pstmt = con.prepareStatement(sql);
-			pstmt.setString(1, status); // 'T' or 'F'
-			pstmt.setString(2, seatCode);
-			cnt = pstmt.executeUpdate();
-		} finally {
-			db.dbClose(null, pstmt, con);
-		}
-		return cnt;
-	}
+//	/**
+//	 * 좌석 상태 개별 변경
+//	 */
+//	public int updateSeatStatus(String seatCode, String status) throws SQLException {
+//		int cnt = 0;
+//		DbConn db = DbConn.getInstance("jdbc/dbcp");
+//		Connection con = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			con = db.getConn();
+//			String sql = "UPDATE SEAT SET available_seat=? WHERE seat_code=?";
+//			pstmt = con.prepareStatement(sql);
+//			pstmt.setString(1, status); // 'T' or 'F'
+//			pstmt.setString(2, seatCode);
+//			cnt = pstmt.executeUpdate();
+//		} finally {
+//			db.dbClose(null, pstmt, con);
+//		}
+//		return cnt;
+//	}
 	
 	/**
 	 * 상영관 상태 변경 (비활성화 등)

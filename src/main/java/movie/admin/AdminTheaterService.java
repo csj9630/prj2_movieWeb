@@ -100,15 +100,15 @@ public class AdminTheaterService {
 		return list;
 	}
 	
-	// 좌석 상태 변경
-	public boolean modifySeatStatus(String seatCode, String status) {
-		try {
-			return TheaterDAO.getInstance().updateSeatStatus(seatCode, status) > 0;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
-	}
+//	// 좌석 상태 변경
+//	public boolean modifySeatStatus(String seatCode, String status) {
+//		try {
+//			return TheaterDAO.getInstance().updateSeatStatus(seatCode, status) > 0;
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			return false;
+//		}
+//	}
 	
 	// 페이지네이션 HTML
 	public String getPagination(int currentPage, int totalPage, int pageGroup, String url) {
