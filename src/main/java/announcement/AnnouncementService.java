@@ -350,7 +350,7 @@ public class AnnouncementService {
 	
 	/**
 	 * 메가박스 스타일 페이지네이션 (<nav class="pagination">...)
-	 * RangeDTO와 호환되도록 작성되었습니다.
+	 * 구성: [First] [Prev]  1 2 3 ... 10  [Next] [Last]
 	 */
 	public String paginationMegaBoxStyle(RangeDTO rDTO) {
 		StringBuilder sb = new StringBuilder();
@@ -361,7 +361,7 @@ public class AnnouncementService {
 		String url = rDTO.getUrl();
 		String keywordParam = "";
 		
-		// 검색어 파라미터 유지 (RangeDTO의 필드명과 JSP의 input name을 맞춰야 함)
+		// 검색어 파라미터 유지
 		if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
 			keywordParam = "&field=" + rDTO.getField() + "&searchTxt=" + rDTO.getKeyword();
 		}
@@ -373,24 +373,21 @@ public class AnnouncementService {
 
 		sb.append("<nav class='pagination'>");
 
-		// 1. [이전] 버튼 그룹 (<, <<)
-		// 맨 처음으로 (Optional)
-		/*
+		// 1. [처음] 버튼 (<<) : 1페이지가 아닐 때 항상 노출
 		if(currentPage > 1) {
 			sb.append("<a title='처음 페이지 보기' href='").append(url)
 			  .append("?currentPage=1").append(keywordParam)
 			  .append("' class='control first'>first</a>");
 		}
-		*/
 		
-		// 이전 10개 (startPage가 1보다 크면 이전 그룹이 존재함)
+		// 2. [이전] 버튼 (<) : 이전 그룹(10페이지 전)이 존재할 때 노출
 		if(startPage > 1) {
 			sb.append("<a title='이전 페이지 보기' href='").append(url)
 			  .append("?currentPage=").append(startPage - 1).append(keywordParam)
 			  .append("' class='control prev'>prev</a>");
 		}
 
-		// 2. [페이지 번호] 출력
+		// 3. [페이지 번호] 출력
 		for(int i = startPage; i <= endPage; i++) {
 			if(i == currentPage) {
 				// 현재 페이지: strong 태그 + active 클래스
@@ -403,15 +400,14 @@ public class AnnouncementService {
 			}
 		}
 
-		// 3. [다음] 버튼 그룹 (>, >>)
-		// 다음 10개 (totalPage가 endPage보다 크면 다음 그룹이 존재함)
+		// 4. [다음] 버튼 (>) : 다음 그룹(10페이지 후)이 존재할 때 노출
 		if(totalPage > endPage) {
 			sb.append("<a title='이후 페이지 보기' href='").append(url)
 			  .append("?currentPage=").append(endPage + 1).append(keywordParam)
 			  .append("' class='control next'>next</a>");
 		}
 		
-		// 맨 마지막으로 (Optional)
+		// 5. [마지막] 버튼 (>>) : 마지막 페이지가 아닐 때 항상 노출
 		if(totalPage > 0 && currentPage < totalPage) {
 			sb.append("<a title='마지막 페이지 보기' href='").append(url)
 			  .append("?currentPage=").append(totalPage).append(keywordParam)
