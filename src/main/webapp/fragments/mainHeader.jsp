@@ -21,7 +21,7 @@
 			if (userId != null && !"".equals(userId)) {
 			%>
 			<div class="after">
-				<a href="${commonURL}/user/member/memberLogin.jsp" class="" title=""><%=userName%>님</a>
+				<a href="${commonURL}/user/movie_mypage/mypage_main.jsp" class="" title=""><%=userName%>님</a>
 				<a href="${commonURL}/user/member/logout.jsp" title="로그아웃">로그아웃</a>
 			</div>
 			<%
@@ -211,8 +211,6 @@
 			<p class="tit-depth">안내</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/theater/list"
-					title="전체극장">자주 묻는 질문</a></li>
 				<li><a href="https://www.megabox.co.kr/specialtheater/list"
 					title="특별관">공지사항</a></li>
 			</ul>
@@ -246,13 +244,13 @@
 					href="${commonURL}/user/movie_mypage/mypage_main.jsp"
 					title="나의 메가박스 홈">마이페이지 홈</a></li>
 				<li><a
-					href="${commonURL}/user/moive_book/mypageBook1.jsp"
+					href="${commonURL}/user/movie_book/mypageBook1.jsp"
 					title="예매/구매내역">예매/구매내역</a></li>
 				<li><a
-					href="${commonURL}/user/moive_movieStory/mypage_movieStory1.jsp"
+					href="${commonURL}/user/movie_moviestroy/mypage_movieStory1.jsp"
 					title="나의 무비스토리">나의 무비스토리</a></li>
 				<li><a
-					href="${commonURL}/user/moive_movieStory/mypage_withdraw1.jsp"
+					href="${commonURL}/user/movie_mystory_mainpage/mypage_withdraw1.jsp"
 					title="회원정보">회원정보</a></li>
 
 			</ul>

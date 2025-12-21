@@ -6,6 +6,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<%@ include file="../../fragments/siteProperty.jsp"%>
+<%@ include file="../../fragments/loginChk.jsp"%>
 <%
 /*ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ*/
 request.setCharacterEncoding("UTF-8");
@@ -21,10 +23,13 @@ String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠ�
 MovieService ms=MovieService.getInstance();
 String imgPath=ms.showMainImage(movieCode);
 request.setAttribute("imgPath", imgPath);
-System.out.println("스크린!!!!! " + screenCode);
-System.out.println(movieCode); 
 /*ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ */
-
+//로그아웃 할 경우 null포인트 오류 방지를 위해 main 페이지로 강제로 보냄.
+String commonURL = (String)application.getAttribute("commonURL");
+if (screenOpen == null) {
+    response.sendRedirect(commonURL + "/user/main/index.jsp");
+    return; // 아래쪽 코드가 실행되지 않도록 중단
+}
  /* String movieCode = "mc001";
 String movieName = "극장판 체인소맨 : 레제편";
 String screenCode = "scc001";
@@ -43,6 +48,7 @@ SeatBookService sbs = SeatBookService.getInstance();
 
 /* 할인 정보(경로, 청소년, 조조, 심야) 기반으로 총 가격 및 할인 코드 추출하기 */
 //screenOpen (예: "09:00")에서 시간만 추출
+
 int openHour = Integer.parseInt(screenOpen.split(":")[0]);
 String discountType = "일반"; // 기본값
 
@@ -53,15 +59,6 @@ if (openHour < 10) {
 }
 // 기본 티켓 가격 (할인 전 원가)
 int defaultTicketPrice = 15000;
-
-
-
-
-
-
-
-
-
 
 //예약된 좌석들 이름(A1, A2형식)
 List<SeatBookDTO> reservedList = sbs.searchRestaurant(screenCode);
@@ -81,8 +78,6 @@ if (reservedList != null) {
 
 %>
 
-<%@ include file="../../fragments/siteProperty.jsp"%>
-<%@ include file="../../fragments/loginChk.jsp"%>
 <html lang="en" data-bs-theme="auto">
 <head>
 <meta charset="UTF-8">
@@ -693,7 +688,16 @@ body {
 					$("#selectedSeatNames").val(selectedSeatNames.join(","));
 					$("#theaterNum").val("<%=theaterNum%>");
 					$("#screenCode").val("<%=screenCode%>");
-					
+				    $("#movieCode").val("<%= movieCode %>");
+				    $("#movieName").val("<%= movieName %>");
+				    $("#theaterName").val("<%= theaterName %>");
+				    $("#screenOpen").val("<%= screenOpen %>");
+				    $("#screenEnd").val("<%= screenEnd %>");
+				    $("#screenDate").val("<%= screenDate %>");
+				    $("#imgPath").val("<%= imgPath %>");
+				    $("#adultCnt").val(adultCnt);
+				    $("#youthCnt").val(youthCnt);
+				    $("#seniorCnt").val(seniorCnt);
 					//유효성 검사 통과 후 예약된 좌석인지 확인하기 위해 ajax를 위한 process.jsp로 form값 넘겨주기
 					var inputCode = $("#submitFrm").serialize();
 					$.ajax({
@@ -737,7 +741,9 @@ body {
 						success : function(responseJSON) {
 							if (responseJSON.status === 'success') {
 								//예매 성공시 결제 페이지로
-								location.href = "${commonURL}/user/payment/paymentFrm.jsp";
+								/* location.href = "${commonURL}/user/payment/paymentFrm.jsp"; */
+								$("#submitFrm").attr("action", "${commonURL}/user/payment/paymentFrm.jsp");
+							    $("#submitFrm").submit();
 							} else if (responseJSON.status === 'fail') {
 								alert("예약 저장에 실패했습니다: " + responseJSON.message);
 				                $("#alert-modal-booking").addClass("hidden"); // 모달 닫기
@@ -834,6 +840,10 @@ body {
 						}
 					});
 		}
+		
+		$("#prev-button").click(function() {
+	        history.back(); // 브라우저의 이전 페이지로 이동
+	    });
 
 	});//ready
 	//"다음"버튼 클릭시 인원 유효성 검사
@@ -866,6 +876,12 @@ body {
 		<input type="hidden" name="selectedSeatNames" id="selectedSeatNames" value="">
 		<input type="hidden" name="discountCodeList" id="discountCodeList" value="">
 		<input type="hidden" name="totalPrice" id="totalPrice" value="">
+		<input type="hidden" name="adultCnt" id="adultCnt" value="">
+		<input type="hidden" name="youthCnt" id="youthCnt" value="">
+		<input type="hidden" name="seniorCnt" id="seniorCnt" value="">
+		
+		
+		
 		
 	</form>
 
@@ -875,7 +891,7 @@ body {
 	<div class="page-util">
 		<div class="inner-wrap">
 			<div class="location">
-				<span>Home</span> <a href="#" title="회원">예매</a> <a href="#">빠른
+				<span>Home</span> <a href="${commonURL}/user/fast_booking/fastBooking.jsp" title="회원">예매</a> <a href="#">빠른
 					예매</a>
 			</div>
 		</div>
@@ -937,7 +953,7 @@ body {
 							<span style="color: #fff;"><%=movieName%></span>
 						</h4>
 						<p><%=theaterName%></p>
-						<p><%=screenDate%></p>
+						<p><%=screenDate%></p>  
 						<span style="color: #FFF"><%=screenOpen%>~<%=screenEnd%></span>
 					</div>
 				</div>

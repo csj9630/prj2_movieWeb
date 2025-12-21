@@ -34,7 +34,6 @@ if (inputCode.equals("11111")) {
 	isValid = true;
 
 	// 인증 완료 하였으니 세션 삭제.
-	session.removeAttribute("authCode");
 
 } else {
 	// 5. 인증 실패

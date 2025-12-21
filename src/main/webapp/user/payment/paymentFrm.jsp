@@ -1,7 +1,40 @@
+<%@page import="java.text.DecimalFormat"%>
+<%@page import="movie.MovieService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ include file="../../fragments/siteProperty.jsp"%>
 <!DOCTYPE html>
+<%@ include file="../../fragments/siteProperty.jsp"%>
+<%@ include file="../../fragments/loginChk.jsp"%>
+<%
+/*ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ*/
+request.setCharacterEncoding("UTF-8");
+
+String movieCode=request.getParameter("movieCode");
+String movieName=request.getParameter("movieName");
+String screenCode=request.getParameter("screenCode");
+String theaterName=request.getParameter("theaterName");
+String screenOpen=request.getParameter("screenOpen");
+String screenEnd=request.getParameter("screenEnd");
+String screenDate=request.getParameter("screenDate");
+String totalPrice=request.getParameter("totalPrice");
+String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠㅠ..
+String adultCnt = request.getParameter("adultCnt");
+String youthCnt = request.getParameter("youthCnt");
+String seniorCnt = request.getParameter("seniorCnt");
+
+DecimalFormat df = new DecimalFormat("###,###");
+int totalBooking = Integer.parseInt(adultCnt) + Integer.parseInt(youthCnt) + Integer.parseInt(seniorCnt);
+int originPrice = totalBooking * 15000;
+int totalDiscount = Math.abs(originPrice - Integer.parseInt(totalPrice));
+
+String formattedTotalPrice = df.format(Integer.parseInt(totalPrice));
+String formattedOriginPrice = df.format(originPrice);
+String formattedTotalDiscount = df.format(totalDiscount);
+
+MovieService ms=MovieService.getInstance();
+String imgPath=ms.showMainImage(movieCode);
+request.setAttribute("imgPath", imgPath);
+%>
 <html lang="en" data-bs-theme="auto">
 <head>
 <meta charset="UTF-8">
@@ -103,9 +136,31 @@
 	box-sizing: border-box;
 }
 </style>
+<script type="text/javascript">
+$(function() {
+	$(function() {
+	    $("#prev-button").click(function(e) {
+	        e.preventDefault(); // 기본 동작 방지
+	        $("#backFrm").submit(); // 파라미터와 함께 이전 페이지(좌석선택)로 이동
+	    });
+	});
+});
+</script>
 </head>
 <!-- body에서 flex 제거: 헤더와 푸터가 정상적으로 나오게 하기 위함 -->
 <body>
+
+<form id="backFrm" action="${commonURL}/user/booking/quickBookingSeat.jsp" method="post">
+    <input type="hidden" name="movieCode" value="<%= movieCode %>">
+    <input type="hidden" name="movieName" value="<%= movieName %>">
+    <input type="hidden" name="screenCode" value="<%= screenCode %>">
+    <input type="hidden" name="theaterName" value="<%= theaterName %>">
+    <input type="hidden" name="screenOpen" value="<%= screenOpen %>">
+    <input type="hidden" name="screenEnd" value="<%= screenEnd %>">
+    <input type="hidden" name="screenDate" value="<%= screenDate %>">
+    <input type="hidden" name="theaterNum" value="<%= theaterNum %>">
+</form>
+
 
 	<header id="header">
 		<jsp:include page="../../fragments/header.jsp" />
@@ -141,16 +196,16 @@
 						<div
 							class="w-24 h-36 bg-gray-800 text-white flex items-center justify-center text-xs text-center shrink-0 overflow-hidden">
 							<!-- 이미지 -->
-							<img
-								src="${commonURL}/resources/images/zoo_book_payment.jpg"
-								onerror="this.src='https://via.placeholder.com/100x150?text=Poster'"
-								alt="포스터" class="w-full h-full object-cover">
+							<img src="${commonURL}/${movieImgPath}/<%= movieCode %>/${imgPath}"
+						alt="<%= movieName %> 포스터">
 						</div>
 						<div class="flex flex-col gap-1 text-sm">
-							<div class="font-bold text-lg mb-1 text-black">주토피아2</div>
-							<div class="text-gray-600">2025.12.03(수) 10:00~11:37</div>
-							<div class="text-gray-600">별내/2관(리클라이너) • 2D(자막)</div>
-							<div class="text-gray-600 font-bold">성인 2</div>
+							<div class="font-bold text-lg mb-1 text-black"><%=movieName%></div>
+							<div class="text-gray-600"><strong><%=screenDate%>&nbsp;/&nbsp;<%=screenOpen%>~<%=screenEnd%></strong></div>
+							<div class="text-gray-600 "><%=theaterName%></div>
+							<div class="text-gray-600 font-bold">성인 <%=adultCnt %>명</div>
+							<div class="text-gray-600 font-bold">청소년 <%=youthCnt %>명</div>
+							<div class="text-gray-600 font-bold">경로 <%=seniorCnt %>명</div>
 						</div>
 					</div>
 				</div>
@@ -165,13 +220,9 @@
 
 					<div class="grid grid-cols-4 text-center text-sm mb-4">
 						<div id="tab-credit" class="payment-tab active py-3 text-black"
-							onclick="selectPaymentTab('credit', '신용카드')">신용카드</div>
-						<div id="tab-a" class="payment-tab py-3 text-black"
-							onclick="selectPaymentTab('a', 'A수단')">A수단</div>
-						<div id="tab-b" class="payment-tab py-3 text-black"
-							onclick="selectPaymentTab('b', 'B수단')">B수단</div>
-						<div id="tab-c" class="payment-tab py-3 text-black"
-							onclick="selectPaymentTab('c', 'C수단')">C수단</div>
+							onclick="selectPaymentTab('credit', '신용카드')" style="width : 591.81px;">신용카드</div>
+						<!-- <div id="tab-a" class="payment-tab py-3 text-black"
+							onclick="selectPaymentTab('a', 'A수단')">어플결제</div> -->
 					</div>
 
 					<div class="border-t border-gray-200 pt-4 px-2">
@@ -247,10 +298,10 @@
 
 					<div class="space-y-4 text-sm border-b border-gray-600 pb-6 mb-6">
 						<div class="flex justify-between">
-							<span>성인 2</span> <span>22,000</span>
+							<span>총 인원</span> <span><%=totalBooking%>명</span>
 						</div>
 						<div class="flex justify-between font-bold text-white">
-							<span>금액</span> <span>22,000 원</span>
+							<span>총 금액</span> <span><%=formattedOriginPrice%>원</span>
 						</div>
 					</div>
 
@@ -260,14 +311,13 @@
 					</div>
 
 					<div
-						class="flex justify-between text-sm mb-6 pb-6 border-b border-gray-600">
-						<span>할인적용</span> <span>0 원</span>
+						class="flex justify-between  mb-6 pb-6 border-b border-gray-600">
+						<span>할인 금액</span> <span><%=formattedTotalDiscount%>원</span>
 					</div>
 
 					<div
 						class="flex justify-between items-end text-xl font-bold text-cyan-400 mb-6">
-						<span class="text-sm text-white font-normal">최종결제금액</span> <span>22,000
-							원</span>
+						<span class="text-sm text-white font-normal">최종결제금액</span> <span><%=formattedTotalPrice %>원</span>
 					</div>
 
 					<div class="flex justify-between text-xs text-gray-400">
@@ -277,7 +327,7 @@
 
 				<!-- 버튼 영역 -->
 				<div class="flex h-14">
-					<button class="flex-1 btn-cancel font-bold">이전</button>
+					<button class="flex-1 btn-cancel font-bold" id="prev-button">이전</button>
 					<button onclick="handlePayment()" class="flex-1 btn-pay font-bold">결제</button>
 				</div>
 			</div>

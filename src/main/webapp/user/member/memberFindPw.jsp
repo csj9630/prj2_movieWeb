@@ -473,7 +473,7 @@ let isCheckCode = false;
 
           //이메일 인증 번호 날릴 때 사용할 ajax.
             $.ajax({
-                url: '/second_project_movie_reservation/quickMail', 
+                url: '/prj2_movieWeb/quickMail', 
                 type: 'POST',
                 data: {
                     email: emailVal 

@@ -266,9 +266,6 @@ function resultLogin() {
                         <span class="divider">|</span>
                         <a href="memberJoinFrm.jsp">회원가입</a>
                     </div>
-                    <div>
-                    <a href="${commonURL}/user/booking/quickBookingSeat.jsp">임시 예매페이지</a>
-                    </div>
                 </form>
             </div>
         </div>
