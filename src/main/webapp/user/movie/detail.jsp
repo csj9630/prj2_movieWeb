@@ -321,7 +321,7 @@ request.setCharacterEncoding("UTF-8");
 
 
 	<footer id="footer">
-		<jsp:include page="../../fragments/header.jsp"/>
+		<jsp:include page="../../fragments/footer.jsp"/>
 	</footer>
 </body>
 
