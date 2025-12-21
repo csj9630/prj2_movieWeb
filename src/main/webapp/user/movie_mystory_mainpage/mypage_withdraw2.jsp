@@ -295,17 +295,14 @@
                 <th>휴대폰 <span class="required">*</span></th>
                 <td>
                   <div class="phone-group" style="display: flex; align-items: center; flex-wrap: wrap; gap: 5px;">
-                    <input type="text" name="phone1" id="phone1" class="phone-input" value="<%= phone1 %>" maxlength="3" />
+                    <input type="text" name="phone1" id="phone1" class="phone-input" value="<%= phone1 %>" readonly style="background-color: #f0f0f0;" />
                     <span>-</span>
-                    <input type="text" name="phone2" id="phone2" class="phone-input" value="<%= phone2 %>" maxlength="4" />
+                    <input type="text" name="phone2" id="phone2" class="phone-input" value="<%= phone2 %>" readonly style="background-color: #f0f0f0;" />
                     <span>-</span>
-                    <input type="text" name="phone3" id="phone3" class="phone-input" value="<%= phone3 %>" maxlength="4" />
-                    <span class="auth-status" id="phone-auth-status"></span>
+                    <input type="text" name="phone3" id="phone3" class="phone-input" value="<%= phone3 %>" readonly style="background-color: #f0f0f0;" />
                   </div>
-                  <!-- reCAPTCHA 컨테이너 (Firebase 필수) -->
-                  <div id="recaptcha-container" style="margin-top: 10px;"></div>
-                  <!-- 인증 완료 여부 hidden 필드 -->
-                  <input type="hidden" name="phoneVerified" id="phoneVerified" value="false" />
+                  <!-- 인증 완료 여부 hidden 필드 (변경 불가하므로 true 또는 제거, 일단 유지하되 값은 의미 없음) -->
+                  <input type="hidden" name="phoneVerified" id="phoneVerified" value="true" />
                 </td>
               </tr>
               <tr>
