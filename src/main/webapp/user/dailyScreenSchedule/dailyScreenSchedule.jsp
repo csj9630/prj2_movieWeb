@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() { // HTML이 다 로딩
 									</button>
 									<div class="date-list" style = "width: 1060px;">
 										<div class="date-area">
-											<div class="wrap" style="position: relative; width: 2100px; border: none; left: -70px;">
+											<div class="wrap" style="position: relative; width: 1300px; border: none; left: -70px;">
 												<%
 												    // 1. 날짜 설정 초기화
 												    Calendar cal = Calendar.getInstance(); // 반복문용 (계속 변함)

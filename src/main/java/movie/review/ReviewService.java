@@ -36,12 +36,13 @@ public class ReviewService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// 아이디 일부를 *처리
-		for (ReviewDTO rDTO : list) {
-			rDTO.setUsers_id(maskUserId(rDTO.getUsers_id()));
-		} // end for
-
+		//System.out.println(list);
+		if(!list.isEmpty() || list != null ) {
+			// 아이디 일부를 *처리
+			for (ReviewDTO rDTO : list) {
+				rDTO.setUsers_id(maskUserId(rDTO.getUsers_id()));
+			} // end for
+		}
 		return list;
 	}// searchReviewList
 

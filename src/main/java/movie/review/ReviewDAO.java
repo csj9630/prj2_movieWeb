@@ -57,10 +57,11 @@ public class ReviewDAO {
 							.append(" FROM REVIEW R ")
 							.append(" JOIN BOOK B ON R.book_num = B.book_num ")
 							.append(" JOIN SCREEN_INFO SI ON B.screen_code = SI.screen_code ")
-							.append(" WHERE SI.movie_code = ? ");
+							.append(" WHERE SI.movie_code = ? ")
+							.append(" order by review_date desc ");
 			
 			//@formatter:on
-
+			//System.out.println(selectReview);
 			pstmt = con.prepareStatement(selectReview.toString());
 			// 5.바인드 변수 값 설정
 			pstmt.setString(1, mvCode);

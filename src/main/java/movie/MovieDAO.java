@@ -336,12 +336,12 @@ public class MovieDAO {
 			.append("     WHEN '청소년' THEN '19' ")
 			.append("     ELSE m.movie_grade ")
 			.append("   END AS movie_grade, ")
-			.append("   m.movie_name, m.release_date, b.book_rate ")
+			.append("   m.movie_name, m.release_date, NVL(b.book_rate, 0) AS book_rate ")
 			.append(" FROM movie m ")
-			.append(" INNER JOIN book_rate b ")
+			.append(" LEFT JOIN book_rate b ")
 			.append("   ON b.movie_code = m.movie_code ")
 			.append(" WHERE m.release_date < sysdate ")
-			.append(" ORDER BY b.book_rate DESC ")
+			.append(" ORDER BY NVL(TO_NUMBER(b.book_rate), 0) DESC ")
 			.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 
 			
@@ -395,12 +395,12 @@ public class MovieDAO {
 			.append("           END AS movie_grade ")
 			.append("         , m.movie_name ")
 			.append("         , m.release_date ")
-			.append("         , b.book_rate ")
+			.append("         , NVL(b.book_rate, 0) AS book_rate ")
 			.append("    FROM movie m ")
-			.append("    INNER JOIN book_rate b ")
+			.append("    LEFT JOIN book_rate b ")
 			.append("        ON b.movie_code = m.movie_code ")
 			.append("    WHERE m.release_date > SYSDATE ")
-			.append("    ORDER BY m.release_date DESC ")
+			.append("    ORDER BY NVL(TO_NUMBER(b.book_rate), 0) DESC ")
 			.append("    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 
 			pstmt=con.prepareStatement(selectPage.toString());

@@ -44,7 +44,7 @@ public class UserLoginDAO {
 			con=dbCon.getConn();
 		//4. 쿼리문 생성객체 얻기
 			String selectMemberData
-			= "select users_name from users where users_id=? and users_pass=?";
+			= "select users_name from users where users_id=? and users_pass=? and active='활성화'";
 			pstmt = con.prepareStatement(selectMemberData);
 		//5. 바인드 변수에 값 설정
 			pstmt.setString(1, lDTO.getUsers_id());

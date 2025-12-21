@@ -89,7 +89,7 @@ import DBConnection.DbConn;
 				con = db.getConn();
 				// 4. 쿼리문 생성객체 얻기
 				String insertmMember = "insert into USERS(USERS_ID, USERS_PASS, EMAIL, USERS_NAME, BIRTH, GENDER,RECENT_LOGIN, JOIN_DATE, ACTIVE, PHONE_NUM) "
-						+ "values(?, ?, ?, ?, ?,?,sysdate, sysdate, '활성',?)";
+						+ "values(?, ?, ?, ?, ?,?,sysdate, sysdate, '활성화',?)";
 				pstmt = con.prepareStatement(insertmMember);
 				// 5. 바인드 변수 값 설정
 				pstmt.setString(1, uDTO.getUsers_id());
