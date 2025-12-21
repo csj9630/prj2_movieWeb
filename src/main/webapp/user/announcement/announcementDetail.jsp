@@ -176,16 +176,6 @@ src="${commonURL}/resources/js/megabox.netfunnel.min.js"></script>
                         </div>
                     </div>
 
-                    <div class="prev-next">
-                        <div class="line prev">
-                            <p class="tit">이전</p>
-                            <p class="link">이전 글이 없습니다.</p>
-                        </div>
-                        <div class="line next">
-                            <p class="tit">다음</p>
-                            <p class="link">다음 글이 없습니다.</p>
-                        </div>
-                    </div>
                     
                     <div class="btn-group pt40">
 			    		<a href="announcementList.jsp?currentPage=${empty param.currentPage ? 1 : param.currentPage}&field=${param.field}&searchTxt=${param.searchTxt}" class="button large listBtn" title="목록">목록</a>

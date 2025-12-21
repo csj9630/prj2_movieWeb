@@ -191,7 +191,7 @@ src="${commonURL}/resources/js/megabox.netfunnel.min.js"></script>
                 <div class="inner-wrap">
                     <div class="location">
                         <span>Home</span>
-                        <a href="#" title="공지사항 페이지로 이동">공지사항</a>
+                        <a href="${commonURL}/user/announcement/announcementList.jsp?currentPage=1" title="공지사항 페이지로 이동">공지사항</a>
                     </div>
                 </div>
             </div>
