@@ -43,6 +43,10 @@ request.setCharacterEncoding("UTF-8");
 
 
 <script type="text/javascript">
+//다른 js파일에서는 EL을 못 쓰므로 사용할 pageContext 저장
+	const contextPath = "${pageContext.request.contextPath}";
+
+
 	//함수 정의는 movie_detail.js에 위치함.
 	$(document).ready(function() {
 		changeTab();//탭 기능

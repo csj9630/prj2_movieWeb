@@ -11,6 +11,7 @@ String scoreStr = request.getParameter("score");
 String content = request.getParameter("content");
 String userId = (String) session.getAttribute("userId");
 
+
 //로그인 확인
 if (userId == null) {
  out.print("login_required");
@@ -21,6 +22,17 @@ if (userId == null) {
 if (movieCode == null || scoreStr == null || content == null) {
  out.print("false");
  return;
+}
+
+//서비스 호출
+ReviewService rs = ReviewService.getInstance();
+
+
+//영화 봤는지 체크.
+String bookCode = rs.checkBookBeforeReview(movieCode,userId);
+if(bookCode ==null || bookCode.isEmpty()){
+	out.print("noBook");
+	 return;
 }
 
 //점수 변환
@@ -43,15 +55,7 @@ if (content.length() < 10 || content.length() > 500) {
  return;
 }
 
-//서버스 호출
-ReviewService rs = ReviewService.getInstance();
 
-//영화 봤는지 체크.
-String bookCode = rs.checkBookBeforeReview(movieCode,userId);
-if(bookCode ==null || bookCode.isEmpty()){
-	out.print("noBook");
-	 return;
-}
 
 //DTO 생성
 

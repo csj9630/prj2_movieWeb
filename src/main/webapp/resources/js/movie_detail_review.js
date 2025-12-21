@@ -64,7 +64,7 @@ function submitReview(movieCode, score, content) {
 
 	// AJAX 요청
 	$.ajax({
-		url: '/prj2_movieWeb/user/movie/detail_review_write.jsp',
+		url: contextPath + '/user/movie/detail_review_write.jsp',
 		type: 'POST',
 		data: {
 			movieCode: movieCode,
