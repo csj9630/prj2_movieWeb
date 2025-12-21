@@ -323,7 +323,7 @@ if (bookList == null) {
                           <td><%= booking.getBookTimeStr() %></td>
                           <td><%= booking.getTheater_name() %></td>
                           <td>
-                              <%= booking.getScreen_date() %>
+                              <%= booking.getScreen_date() %> - <%= booking.getScreen_open() %>
                               <%-- 
                                   [유효성 검증: 상영일시 < 예매일자 체크]
                                   현재 데이터가 테스트 데이터라 상영일이 예매일보다 과거인 경우가 있음.
@@ -340,7 +340,7 @@ if (bookList == null) {
                                       
                                       if(bDateStr != null && sDateStr != null) {
                                           java.text.SimpleDateFormat sdfBook = new java.text.SimpleDateFormat("yy/MM/dd");
-                                          java.text.SimpleDateFormat sdfScreen = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                          java.text.SimpleDateFormat sdfScreen = new java.text.SimpleDateFormat("yyyy-MM-dd - HH:mm");
                                           
                                           java.util.Date bDate = sdfBook.parse(bDateStr);
                                           java.util.Date sDate = sdfScreen.parse(sDateStr);
@@ -361,7 +361,7 @@ if (bookList == null) {
                                   }
                               %>
                           </td>
-                          <td><%= "결제완료".equals(booking.getBook_state()) ? "예매 완료" : "예매 취소" %></td>
+                          <td><%= "결제완료".equals(booking.getBook_state()) ? "예매 완료" : "결제대기".equals(booking.getBook_state()) ? "결제 대기" : "예매 취소" %></td>
                         </tr>
                   <%
                       }

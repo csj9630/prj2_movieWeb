@@ -12,7 +12,10 @@
 </head>
 <body>
   <script>
-    // ------ 클라이언트 키로 객체 초기화 ------
+    // 파라미터로 넘어온 bookNum 가져오기 (JSP 스크립틀릿 사용)
+    <% String bookNum = request.getParameter("bookNum"); %>
+    var bookNum = "<%= bookNum != null ? bookNum : "" %>";
+
     var clientKey = "test_ck_EP59LybZ8BlKZ0YYW9QGV6GYo7pR";
     var tossPayments = TossPayments(clientKey);
     // ------ 결제창 띄우기 ------
@@ -27,8 +30,8 @@
         orderName: "테스트 결제", // 구매상품
         customerName: "김토스", // 구매자 이름
         //successUrl: "https://www.naver.com", // 결제 성공 시 이동할 페이지(이 주소는 예시입니다. 상점에서 직접 만들어주세요.)
-        successUrl: "http://localhost/second_project_movie_reservation/index/index.jsp", // 결제 성공 시 이동할 페이지(이 주소는 예시입니다. 상점에서 직접 만들어주세요.)
-        failUrl: "https://www.naver.com", // 결제 실패 시 이동할 페이지(이 주소는 예시입니다. 상점에서 직접 만들어주세요.)
+        successUrl: "${commonURL}/user/payment/paymentProcess.jsp?bookNum=" + bookNum, // 결제 성공 시 이동할 페이지
+        failUrl: "${commonURL}/user/main/index.jsp", // 결제 실패 시 이동할 페이지
       })
       // ------결제창을 띄울 수 없는 에러 처리 ------
       // 메서드 실행에 실패해서 reject 된 에러를 처리하는 블록입니다.

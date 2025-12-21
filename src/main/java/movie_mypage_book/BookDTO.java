@@ -14,6 +14,7 @@ public class BookDTO {
 	private String movie_code;  // 영화 코드 (포스터 경로 및 상세페이지 링크용)
 	private String theater_name;
 	private String screen_date; // Keeping as String for now as per ScreenInfoDTO, check DB type later if needed
+	private String screen_open; // 상영 시작 시간
 	private int screen_price;
 	
 	public BookDTO() {
@@ -105,6 +106,14 @@ public class BookDTO {
 
 	public void setScreen_date(String screen_date) {
 		this.screen_date = screen_date;
+	}
+	
+	public String getScreen_open() {
+		return screen_open;
+	}
+
+	public void setScreen_open(String screen_open) {
+		this.screen_open = screen_open;
 	}
 
 	public int getScreen_price() {

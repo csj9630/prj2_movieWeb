@@ -51,8 +51,8 @@ public class SeatBookService {
 	
 	
 	//영화 예매 진행하는 메인 메소드
-	public int processCompleteBooking(SeatBookDTO sbDTO) {
-	    int result = 0;
+	public String processCompleteBooking(SeatBookDTO sbDTO) {
+	    String result = null;
 	    SeatBookDAO sDAO = SeatBookDAO.getInstance();
 	    
 	    try {

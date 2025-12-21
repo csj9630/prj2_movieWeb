@@ -185,7 +185,7 @@ pageEncoding="UTF-8"%>
               <c:otherwise>
                 <c:forEach var="booking" items="${recentBookings}">
                   <%-- 카드 전체를 클릭하면 영화 상세 페이지로 이동 --%>
-                  <a href="${pageContext.request.contextPath}/user/movie/detail.jsp?mCode=${booking.movie_code}" 
+                  <a href="${pageContext.request.contextPath}/user/movie/detail.jsp?code=${booking.movie_code}" 
                      class="booking-card" style="text-decoration: none; color: inherit;">
                     <%-- 영화 포스터 (movie_code 기반 경로) --%>
                     <c:choose>
@@ -204,7 +204,7 @@ pageEncoding="UTF-8"%>
                     <div class="booking-info">
                       <div class="booking-title">${booking.movie_name}</div>
                       <div class="booking-detail">${booking.theater_name}</div>
-                      <div class="booking-date">${booking.screen_date} 관람예정</div>
+                      <div class="booking-date">${booking.screen_date} - ${booking.screen_open} 관람예정</div>
                     </div>
                     
                     <%-- 인원수 --%>

@@ -62,6 +62,7 @@ public class MovieTimelineDAO {
 			   .append("JOIN THEATHER_INFO t ON s.theather_num = t.theather_num ")
 			   .append("JOIN MOVIE m ON s.movie_code = m.movie_code ")
 			   .append("WHERE b.users_id = ? ")
+			   .append("AND TRIM(b.book_state) = '결제완료' ")
 			   .append("ORDER BY s.screen_date DESC");
 			
 			pstmt = con.prepareStatement(sql.toString());

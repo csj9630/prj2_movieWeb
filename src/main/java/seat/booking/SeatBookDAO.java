@@ -10,6 +10,8 @@ import java.util.List;
 import DBConnection.DbConn;
 
 
+import movie_mypage_book.BookDAO;
+
 public class SeatBookDAO {
 	private static SeatBookDAO sbDAO;
 
@@ -26,6 +28,9 @@ public class SeatBookDAO {
 	
 	//빠른 예매 페이지에서 페이지 로딩시 좌석 그리기
 	public List<SeatBookDTO> selectAllSeatBook(String screen_code) throws SQLException {
+		// [자동 정리] 좌석 조회 전 만료된 예약 정리 (전체 사용자 대상)
+		BookDAO.getInstance().cancelAllExpiredBookings();
+		
 		List<SeatBookDTO> list = new ArrayList<SeatBookDTO>();
 
 		DbConn dbCon = DbConn.getInstance("jdbc/dbcp");
@@ -107,32 +112,48 @@ public class SeatBookDAO {
 
 	
 	//영화 예매 메인 메소드
-	public int insertBookingTransaction(SeatBookDTO dto) throws SQLException {
+	public String insertBookingTransaction(SeatBookDTO dto) throws SQLException {
 		DbConn dbCon = DbConn.getInstance("jdbc/dbcp");
 		Connection con = null;
 		PreparedStatement pstmt = null;
-	    int result = 0;
+	    String bookNum = null;
+	    
+	    // 1. 시퀀스로 번호 먼저 생성
+	    String sqlSeq = "SELECT 'bn'||LPAD(book_seq.NEXTVAL, 3, '0') FROM DUAL";
 
 	    //Book 
 	    String sqlBook = "INSERT INTO BOOK (book_num, book_time, book_state, total_book, screen_code, users_id) " +
-                "VALUES ('bn'||LPAD(book_seq.NEXTVAL, 3, '0'), TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS'), '결제대기', ?, ?, ?)";
-	    // 'B'||book_seq.CURRVAL를 사용하여 방금 생성된 예약번호를 참조
+                "VALUES (?, TO_CHAR(SYSDATE, 'YYYY-MM-DD HH24:MI:SS'), '결제대기', ?, ?, ?)";
+	    // 이미 생성된 bookNum 사용
 	    String sqlSeat = "INSERT INTO SEAT_BOOK (seat_book_code, seat_code, screen_code, book_num, discount_code) " +
-                "VALUES ('sb'||LPAD(seat_book_seq.NEXTVAL, 3, '0'), ?, ?, 'bn'||LPAD(book_seq.CURRVAL, 3, '0'), ?)";
+                "VALUES ('sb'||LPAD(seat_book_seq.NEXTVAL, 3, '0'), ?, ?, ?, ?)";
 	    
 	    String sqlPay = "INSERT INTO PAYMENT (payment_code, payment_price, payment_method, payment_time, payment_state, book_num) " +
-                "VALUES ('pc'||LPAD(payment_seq.NEXTVAL, 3, '0'), ?, ?, SYSDATE, '결제중', 'bn'||LPAD(book_seq.CURRVAL, 3, '0'))";
+                "VALUES ('pc'||LPAD(payment_seq.NEXTVAL, 3, '0'), ?, ?, SYSDATE, '결제중', ?)";
 
 	    try {
 	    	con = dbCon.getConn();
 	        con.setAutoCommit(false); // 트랜잭션 시작
 
+	        // 1. 에매 번호 생성
+	        pstmt = con.prepareStatement(sqlSeq);
+	        ResultSet rs = pstmt.executeQuery();
+	        if(rs.next()) {
+	        	bookNum = rs.getString(1);
+	        }
+	        pstmt.close();
+	        
+	        if(bookNum == null) {
+	        	throw new SQLException("예매 번호 생성 실패");
+	        }
+	        
 	        //BOOK 테이블
 	        pstmt = con.prepareStatement(sqlBook);
-	        pstmt.setInt(1, dto.getSeatCodes().size());
-	        pstmt.setString(2, dto.getScreenCode());
-	        pstmt.setString(3, dto.getUserId());
-	        result += pstmt.executeUpdate();
+	        pstmt.setString(1, bookNum);
+	        pstmt.setInt(2, dto.getSeatCodes().size());
+	        pstmt.setString(3, dto.getScreenCode());
+	        pstmt.setString(4, dto.getUserId());
+	        pstmt.executeUpdate();
 	        pstmt.close();
 
 	        //SEAT_BOOK 테이블 (좌석 수만큼 반복)
@@ -140,7 +161,8 @@ public class SeatBookDAO {
 	        for (int i = 0; i < dto.getSeatCodes().size(); i++) {
 	            pstmt.setString(1, dto.getSeatCodes().get(i));
 	            pstmt.setString(2, dto.getScreenCode());
-	            pstmt.setString(3, dto.getDiscountCodes().get(i));
+	            pstmt.setString(3, bookNum);
+	            pstmt.setString(4, dto.getDiscountCodes().get(i));
 	            pstmt.executeUpdate();
 	        }
 	        pstmt.close();
@@ -149,14 +171,14 @@ public class SeatBookDAO {
 	        pstmt = con.prepareStatement(sqlPay);
 	        pstmt.setInt(1, dto.getTotalPrice());
 	        pstmt.setString(2, "CARD");
-	        result += pstmt.executeUpdate();
+	        pstmt.setString(3, bookNum);
+	        pstmt.executeUpdate();
 
 	        con.commit(); // 모두 성공 시 확정
-	        result = 1; // 성공 지표 반환
 
 	    } catch (Exception e) {
 	        if (con != null) con.rollback(); // 하나라도 실패 시 전체 취소
-	        result = 0;
+	        bookNum = null; // 실패 시 null 반환
 	        throw e;
 	    } finally {
 	        if (con != null) {
@@ -164,7 +186,7 @@ public class SeatBookDAO {
 	            con.close();
 	        }
 	    }
-	    return result;
+	    return bookNum;
 	}
 	
 	//예약 확인

@@ -51,13 +51,13 @@ sbDTO.setDiscountCodes(discountCodeList);
 
 System.out.println("예약 좌석 : " + seatCodeList);
 
-int success = sbs.processCompleteBooking(sbDTO);
+String bookNum = sbs.processCompleteBooking(sbDTO);
 
 //2. JSON 문자열 생성
 String responseJSON = "";
-if (success > 0) {
-    // 성공 시 status를 success로 반환
-    responseJSON = "{\"status\":\"success\", \"message\":\"예약 정보가 저장되었습니다.\"}";
+if (bookNum != null) {
+    // 성공 시 status를 success로 반환하고, 생성된 예매 번호도 함께 전송
+    responseJSON = "{\"status\":\"success\", \"message\":\"예약 정보가 저장되었습니다.\", \"bookNum\":\"" + bookNum + "\"}";
 } else {
     // 실패 시 status를 fail로 반환
     responseJSON = "{\"status\":\"fail\", \"message\":\"데이터베이스 저장 중 오류가 발생했습니다.\"}";

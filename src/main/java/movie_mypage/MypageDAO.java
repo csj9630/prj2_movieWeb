@@ -144,21 +144,25 @@ public class MypageDAO {
             
             // 예매 완료(book_state='T')이고, 상영일이 아직 오지 않은 최근 예매
             // book_time은 문자열(YY/MM/DD) 형태로 저장되어 있으므로 TO_DATE 사용
+            	// 쿼리 수정: screen_date 포맷팅, book_state 공백제거 확인
             StringBuilder sql = new StringBuilder();
             sql.append("SELECT b.book_num, b.users_id, b.screen_code, b.book_state, ")
                .append("       b.total_book, b.book_time, ")
                .append("       m.movie_name, m.main_image, m.movie_code, ")
-               .append("       t.theather_name, s.screen_date, s.screen_price ")
+               .append("       t.theather_name, ")
+               .append("       TO_CHAR(s.screen_date, 'YYYY-MM-DD') AS screen_date, ") // 날짜 포맷팅
+               .append("       s.screen_price, ")
+               .append("       TO_CHAR(s.screen_open, 'HH24:MI') AS screen_open_time ") 
                .append("FROM BOOK b ")
                .append("JOIN SCREEN_INFO s ON b.screen_code = s.screen_code ")
                .append("JOIN MOVIE m ON s.movie_code = m.movie_code ")
                .append("JOIN THEATHER_INFO t ON s.theather_num = t.theather_num ")
                .append("WHERE b.users_id = ? ")
-               .append("AND b.book_state = '결제완료' ")
+               .append("AND TRIM(b.book_state) = '결제완료' ") // 공백제거 추가
                // 상영일이 오늘 이후인 예매 (앞으로 볼 영화)
                .append("AND s.screen_date >= TRUNC(SYSDATE) ")
                // 예매일이 최근 N일 이내
-               .append("AND TO_DATE(b.book_time, 'YY/MM/DD') >= SYSDATE - ? ")
+               .append("AND TO_DATE(b.book_time, 'YYYY-MM-DD HH24:MI:SS') >= SYSDATE - ? ")
                .append("ORDER BY s.screen_date ASC ")
                // 최대 3건만 표시
                .append("FETCH FIRST 3 ROWS ONLY");
@@ -183,6 +187,7 @@ public class MypageDAO {
                 dto.setMovie_code(rs.getString("movie_code"));  // 영화 코드 추가
                 dto.setTheater_name(rs.getString("theather_name"));
                 dto.setScreen_date(rs.getString("screen_date"));
+                dto.setScreen_open(rs.getString("screen_open_time")); // 시간 설정
                 dto.setScreen_price(rs.getInt("screen_price"));
                 
                 list.add(dto);

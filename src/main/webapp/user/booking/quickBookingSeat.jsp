@@ -742,6 +742,12 @@ body {
 							if (responseJSON.status === 'success') {
 								//예매 성공시 결제 페이지로
 								/* location.href = "${commonURL}/user/payment/paymentFrm.jsp"; */
+								
+								// 서버에서 받은 bookNum을 hidden input에 설정
+                                if(responseJSON.bookNum) {
+                                    $("#bookNum").val(responseJSON.bookNum);
+                                }
+								
 								$("#submitFrm").attr("action", "${commonURL}/user/payment/paymentFrm.jsp");
 							    $("#submitFrm").submit();
 							} else if (responseJSON.status === 'fail') {
@@ -879,6 +885,7 @@ body {
 		<input type="hidden" name="adultCnt" id="adultCnt" value="">
 		<input type="hidden" name="youthCnt" id="youthCnt" value="">
 		<input type="hidden" name="seniorCnt" id="seniorCnt" value="">
+		<input type="hidden" name="bookNum" id="bookNum" value="">
 		
 		
 		

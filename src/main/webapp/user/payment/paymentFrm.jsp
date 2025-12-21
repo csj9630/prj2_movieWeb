@@ -21,6 +21,7 @@ String theaterNum = request.getParameter("theaterNum");//추가해주세요ㅠ�
 String adultCnt = request.getParameter("adultCnt");
 String youthCnt = request.getParameter("youthCnt");
 String seniorCnt = request.getParameter("seniorCnt");
+String bookNum = request.getParameter("bookNum");
 
 DecimalFormat df = new DecimalFormat("###,###");
 int totalBooking = Integer.parseInt(adultCnt) + Integer.parseInt(youthCnt) + Integer.parseInt(seniorCnt);
@@ -159,6 +160,7 @@ $(function() {
     <input type="hidden" name="screenEnd" value="<%= screenEnd %>">
     <input type="hidden" name="screenDate" value="<%= screenDate %>">
     <input type="hidden" name="theaterNum" value="<%= theaterNum %>">
+    <input type="hidden" name="bookNum" value="<%= bookNum %>">
 </form>
 
 
@@ -427,7 +429,7 @@ $(function() {
                 alertModal.classList.remove('hidden');
             } else {
                 // 결제 성공 시 페이지 이동 (카드 결제 페이지)
-                location.href = '${commonURL}/user/payment/payment.jsp'; 
+                location.href = '${commonURL}/user/payment/payment.jsp?bookNum=<%=bookNum%>'; 
                 // 또는 서버 로직에 따라 form submit 등을 수행
             }
         }

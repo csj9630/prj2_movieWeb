@@ -38,6 +38,9 @@ public class BookDAO {
 		ResultSet rs = null;
 		
 		try {
+			// [자동 정리] 조회 시 오래된 결제대기 건 취소 처리
+			cancelPendingBookings(userId);
+			
 			con = db.getConn();
 			
 			if(con == null) {
@@ -46,10 +49,14 @@ public class BookDAO {
 			}
 			
 			StringBuilder sql = new StringBuilder();
-			sql.append("SELECT b.book_num, b.users_id, b.screen_code, b.book_state, ")
+			// 공백 문제 방지를 위해 TRIM 적용
+			sql.append("SELECT b.book_num, b.users_id, b.screen_code, TRIM(b.book_state) as book_state, ")
 			   .append("       b.total_book, b.book_time, ")
 			   .append("       m.movie_name, m.main_image, ")
-			   .append("       t.theather_name, s.screen_date, s.screen_price ")
+			   .append("       t.theather_name, ")
+			   .append("       TO_CHAR(s.screen_date, 'YYYY-MM-DD') AS screen_date, ")
+			   .append("       TO_CHAR(s.screen_open, 'HH24:MI:SS') AS screen_open, ") // 시간 추가
+			   .append("       s.screen_price ")
 			   .append("FROM BOOK b ")
 			   .append("JOIN SCREEN_INFO s ON b.screen_code = s.screen_code ")
 			   .append("JOIN MOVIE m ON s.movie_code = m.movie_code ")
@@ -78,14 +85,8 @@ public class BookDAO {
 				if("ACTIVE".equals(type) || "PAST".equals(type)) {
 					String monthStr = month.length() == 1 ? "0" + month : month;
 					
-					// DB 포맷이 'YY/MM/DD' (ex: 25/12/15) 형태라고 판단됨 ('rs.getString' 결과 및 검색 실패 원인 분석)
-					// 따라서 '2025' -> '25'로 변환하고 구분자를 '/'로 변경하여 검색
-					String shortYear = year;
-					if(year.length() == 4) {
-						shortYear = year.substring(2);
-					}
-					
-					pstmt.setString(paramIdx++, shortYear + "/" + monthStr + "%"); 
+					// DB 포맷이 'YYYY-MM-DD HH24:MI:SS' 형태임
+					pstmt.setString(paramIdx++, year + "-" + monthStr + "%"); 
 				}
 			}
 			
@@ -104,6 +105,7 @@ public class BookDAO {
 				dto.setMain_image(rs.getString("main_image"));
 				dto.setTheater_name(rs.getString("theather_name"));
 				dto.setScreen_date(rs.getString("screen_date"));
+				dto.setScreen_open(rs.getString("screen_open")); // 시간 설정
 				dto.setScreen_price(rs.getInt("screen_price"));
 				
 				list.add(dto);
@@ -114,6 +116,155 @@ public class BookDAO {
 		}
 		
 		return list;
+	}
+	
+	/**
+	 * 예매 상태 변경 (결제대기 -> 결제완료 or 취소)
+	 * @param bookNum 예매 번호
+	 * @param state 변경할 상태
+	 * @return 성공 여부 (1:성공, 0:실패)
+	 * @throws SQLException
+	 */
+	public int updateBookState(String bookNum, String state) throws SQLException {
+		int result = 0;
+		DbConn db = DbConn.getInstance("jdbc/dbcp");
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = db.getConn();
+			String sql = "UPDATE BOOK SET book_state = ? WHERE book_num = ?";
+			
+			pstmt = con.prepareStatement(sql);
+			pstmt.setString(1, state);
+			pstmt.setString(2, bookNum);
+			
+			result = pstmt.executeUpdate();
+			
+		} finally {
+			db.dbClose(null, pstmt, con);
+		}
+		
+		return result;
+	}
+
+
+	
+	/**
+	 * 일정 시간이 지난 '결제대기' 상태의 예매를 '결제취소'로 변경 (스케줄러 대용)
+	 * @param userId 사용자 ID
+	 * @return 업데이트된 건수
+	 */
+	public int cancelPendingBookings(String userId) {
+		int result = 0;
+		DbConn db = DbConn.getInstance("jdbc/dbcp");
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = db.getConn();
+			con.setAutoCommit(false); // 트랜잭션 처리
+			
+			// 1. 대상 조회 조건 (1분 이상 지난 결제대기)
+			// 재결제 기능이 없으므로 비교적 짧게 설정하여 좌석 점유 해제
+			String whereClause = "WHERE users_id = ? " +
+			                     "AND book_state = '결제대기' " +
+			                     "AND (SYSDATE - TO_DATE(book_time, 'YYYY-MM-DD HH24:MI:SS')) * 24 * 60 > 1";
+
+			// 2. SEAT_BOOK 테이블 데이터 삭제 (좌석 점유 해제)
+			// BOOK 테이블이 업데이트되기 전에 수행 (book_state가 아직 '결제대기'일 때)
+			String seatWhere = "WHERE book_num IN (SELECT book_num FROM BOOK " + whereClause + ")";
+			String sqlSeat = "DELETE FROM SEAT_BOOK " + seatWhere;
+			pstmt = con.prepareStatement(sqlSeat);
+			pstmt.setString(1, userId);
+			int deletedSeats = pstmt.executeUpdate();
+			pstmt.close();
+			
+			// 3. PAYMENT 테이블 업데이트 (결제중 -> 결제취소)
+            // PAYMENT에는 users_id 컬럼이 없으므로 book_num 서브쿼리로 연결해야 함
+            String paymentWhere = "WHERE book_num IN (SELECT book_num FROM BOOK " + whereClause + ")";
+			String sqlPayment = "UPDATE PAYMENT SET payment_state = '결제취소' " + paymentWhere;
+			
+			pstmt = con.prepareStatement(sqlPayment);
+            // 서브쿼리 내의 users_id 파라미터 바인딩
+			pstmt.setString(1, userId);
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			// 3. BOOK 테이블 업데이트 (결제대기 -> 결제취소)
+			String sqlBook = "UPDATE BOOK SET book_state = '결제취소' " + whereClause;
+			
+			pstmt = con.prepareStatement(sqlBook);
+			pstmt.setString(1, userId);
+			result = pstmt.executeUpdate();
+			
+			con.commit();
+			
+			if(result > 0) {
+				System.out.println("[INFO] Auto-cancelled " + result + " pending bookings (and payments) for user: " + userId);
+			}
+			
+		} catch (SQLException e) {
+			try { con.rollback(); } catch(SQLException se) {}
+			e.printStackTrace();
+		} finally {
+			try { db.dbClose(null, pstmt, con); } catch(Exception e) {}
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * [전체 사용자] 일정 시간이 지난 '결제대기' 건 일괄 정리 (좌석 조회 전 호출용)
+	 * @return 업데이트된 건수
+	 */
+	public int cancelAllExpiredBookings() {
+		int result = 0;
+		DbConn db = DbConn.getInstance("jdbc/dbcp");
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		
+		try {
+			con = db.getConn();
+			con.setAutoCommit(false);
+			
+			// 1. 대상 조회 조건 (1분 이상 지난 결제대기, 전체 사용자 대상)
+			String whereClause = "WHERE book_state = '결제대기' " +
+			                     "AND (SYSDATE - TO_DATE(book_time, 'YYYY-MM-DD HH24:MI:SS')) * 24 * 60 > 1";
+
+			// 2. SEAT_BOOK 테이블 데이터 삭제
+			String seatWhere = "WHERE book_num IN (SELECT book_num FROM BOOK " + whereClause + ")";
+			String sqlSeat = "DELETE FROM SEAT_BOOK " + seatWhere;
+			pstmt = con.prepareStatement(sqlSeat);
+			int deletedSeats = pstmt.executeUpdate();
+			pstmt.close();
+			
+			// 3. PAYMENT 테이블 업데이트 (결제중 -> 결제취소)
+            String paymentWhere = "WHERE book_num IN (SELECT book_num FROM BOOK " + whereClause + ")";
+			String sqlPayment = "UPDATE PAYMENT SET payment_state = '결제취소' " + paymentWhere;
+			pstmt = con.prepareStatement(sqlPayment);
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			// 4. BOOK 테이블 업데이트 (결제대기 -> 결제취소)
+			String sqlBook = "UPDATE BOOK SET book_state = '결제취소' " + whereClause;
+			pstmt = con.prepareStatement(sqlBook);
+			result = pstmt.executeUpdate();
+			
+			con.commit();
+			
+			if(result > 0) {
+				System.out.println("[INFO] Auto-cancelled " + result + " expired bookings (Global check).");
+			}
+			
+		} catch (SQLException e) {
+			try { con.rollback(); } catch(SQLException se) {}
+			e.printStackTrace();
+		} finally {
+			try { db.dbClose(null, pstmt, con); } catch(Exception e) {}
+		}
+		
+		return result;
 	}
 
 }
