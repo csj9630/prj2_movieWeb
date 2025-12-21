@@ -3,6 +3,9 @@ package movie.review;
 import java.sql.SQLException;
 import java.util.List;
 
+import moviestory.dao.MovieReviewDAO;
+import moviestory.dto.MovieReviewDTO;
+
 public class ReviewService {
 	// ------싱글톤 패턴------------------------
 	private static ReviewService rs;
@@ -99,5 +102,44 @@ public class ReviewService {
         // 5. 합치기
         return prefix + mask.toString() + suffix;
     }//maskUserId
+	
+    // ========== [리뷰 등록] ==========
+    /**
+     * 새 리뷰 등록
+     * @param dto 리뷰 정보
+     * @return 등록 성공 여부
+     */
+    public boolean addReview(ReviewDTO dto) {
+        boolean result = false;
+        
+        try {
+        	ReviewDAO rDAO = ReviewDAO.getInstance();
+            result = rDAO.insertReview(dto);
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        
+        return result;
+    }
+    /**
+     * 
+     * 댓글 작성 전 영화 시청했는지 체크.
+     * @param userId
+     * @return 영화 본적없으면 empty, 있으면 book_num
+     */
+    public String checkBookBeforeReview(String movieCode, String userId) {
+    	String result = "";
+    	
+    	try {
+    		ReviewDAO rDAO = ReviewDAO.getInstance();
+    		result = rDAO.selectBookForReview(movieCode,userId);
+
+    		//System.out.println("service: "+result);
+    	} catch (SQLException se) {
+    		se.printStackTrace();
+    	}
+    	
+    	return result;
+    }
 	
 }// class

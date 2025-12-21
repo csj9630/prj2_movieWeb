@@ -1,237 +1,209 @@
-$(document).ready(function() {
-    
-    // ============================================
-    // 1. 메뉴 토글 기능
-    // ============================================
-    function toggleMenu(commentId) {
-        var $menu = $('#menu-' + commentId);
-        
-        // 다른 메뉴 닫기
-        $('.menu-dropdown').not($menu).hide();
-        
-        // 현재 메뉴 토글
-        $menu.toggle();
-    }
-    
-    // ============================================
-    // 2. 댓글 수정 모드 전환
-    // ============================================
-    function editComment(commentId) {
-        var $commentContent = $('#comment-' + commentId).find('.comment-content');
-        var currentText = $commentContent.text().trim();
-        
-        // 기존 내용 데이터 속성으로 저장
-        $commentContent.data('original-text', currentText);
-        
-        var editHtml = 
-            '<div class="edit-area">' +
-                '<textarea id="edit-textarea-' + commentId + '" class="edit-textarea">' + 
-                currentText + '</textarea>' +
-                '<div class="edit-buttons">' +
-                    '<button class="btn-save" data-comment-id="' + commentId + '">저장</button>' +
-                    '<button class="btn-cancel" data-comment-id="' + commentId + '">취소</button>' +
-                '</div>' +
-            '</div>';
-        
-        $commentContent.html(editHtml);
-        
-        // 자동 포커스 및 높이 조절
-        var $textarea = $('#edit-textarea-' + commentId);
-        $textarea.focus();
-        autoResizeTextarea($textarea);
-        
-        toggleMenu(commentId);
-    }
-    
-    // ============================================
-    // 3. 댓글 수정 저장
-    // ============================================
-    function saveComment(commentId) {
-        var newContent = $('#edit-textarea-' + commentId).val().trim();
-        var $commentContent = $('#comment-' + commentId).find('.comment-content');
-        var $saveBtn = $('.btn-save[data-comment-id="' + commentId + '"]');
-        
-        if (!newContent) {
-            alert('내용을 입력해주세요.');
-            return;
-        }
-        
-        // 로딩 상태
-        $saveBtn.prop('disabled', true).text('저장 중...');
-        
-        $.ajax({
-            url: 'updateComment.jsp',
-            type: 'POST',
-            data: {
-                commentId: commentId,
-                content: newContent
-            },
-            dataType: 'json',
-            success: function(data) {
-                if (data.success) {
-                    $commentContent.text(newContent);
-                    showToast('수정되었습니다.');
-                } else {
-                    alert('수정 실패: ' + (data.message || ''));
-                    cancelEdit(commentId);
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('수정 중 오류가 발생했습니다.');
-                console.error(error);
-                cancelEdit(commentId);
-            },
-            complete: function() {
-                $saveBtn.prop('disabled', false).text('저장');
-            }
-        });
-    }
-    
-    // ============================================
-    // 4. 댓글 수정 취소
-    // ============================================
-    function cancelEdit(commentId) {
-        var $commentContent = $('#comment-' + commentId).find('.comment-content');
-        var originalText = $commentContent.data('original-text');
-        $commentContent.text(originalText);
-    }
-    
-    // ============================================
-    // 5. 댓글 삭제
-    // ============================================
-    function deleteComment(commentId) {
-        if (!confirm('정말 삭제하시겠습니까?')) {
-            return;
-        }
-        
-        var $comment = $('#comment-' + commentId);
-        
-        $.ajax({
-            url: 'deleteComment.jsp',
-            type: 'POST',
-            data: {
-                commentId: commentId
-            },
-            dataType: 'json',
-            beforeSend: function() {
-                $comment.css('opacity', '0.5');
-            },
-            success: function(data) {
-                if (data.success) {
-                    $comment.slideUp(300, function() {
-                        $(this).remove();
-                        updateCommentCount();
-                    });
-                    showToast('삭제되었습니다.');
-                } else {
-                    alert('삭제 실패: ' + (data.message || ''));
-                    $comment.css('opacity', '1');
-                }
-            },
-            error: function(xhr, status, error) {
-                alert('삭제 중 오류가 발생했습니다.');
-                console.error(error);
-                $comment.css('opacity', '1');
-            }
-        });
-    }
-    
-    // ============================================
-    // 6. 토스트 메시지 표시
-    // ============================================
-    function showToast(message) {
-        var $toast = $('<div class="toast">' + message + '</div>');
-        $('body').append($toast);
-        
-        setTimeout(function() {
-            $toast.addClass('show');
-        }, 100);
-        
-        setTimeout(function() {
-            $toast.removeClass('show');
-            setTimeout(function() {
-                $toast.remove();
-            }, 300);
-        }, 2000);
-    }
-    
-    // ============================================
-    // 7. 댓글 개수 업데이트
-    // ============================================
-    function updateCommentCount() {
-        var count = $('.comment-item').length;
-        $('#comment-count').text(count);
-    }
-    
-    // ============================================
-    // 8. 텍스트 영역 자동 높이 조절
-    // ============================================
-    function autoResizeTextarea($textarea) {
-        $textarea.css('height', 'auto');
-        $textarea.css('height', $textarea[0].scrollHeight + 'px');
-    }
-    
-    // ============================================
-    // 이벤트 리스너 등록
-    // ============================================
-    
-    // 메뉴 버튼 클릭
-    $(document).on('click', '.menu-btn', function(e) {
-        e.stopPropagation();
-        var commentId = $(this).data('comment-id') || 
-                       $(this).closest('.comment-menu').find('.menu-dropdown').attr('id').replace('menu-', '');
-        toggleMenu(commentId);
-    });
-    
-    // 수정 버튼 클릭
-    $(document).on('click', '.menu-dropdown button:contains("수정")', function() {
-        var commentId = $(this).closest('.menu-dropdown').attr('id').replace('menu-', '');
-        editComment(commentId);
-    });
-    
-    // 삭제 버튼 클릭
-    $(document).on('click', '.menu-dropdown button:contains("삭제")', function() {
-        var commentId = $(this).closest('.menu-dropdown').attr('id').replace('menu-', '');
-        deleteComment(commentId);
-    });
-    
-    // 저장 버튼 클릭
-    $(document).on('click', '.btn-save', function() {
-        var commentId = $(this).data('comment-id');
-        saveComment(commentId);
-    });
-    
-    // 취소 버튼 클릭
-    $(document).on('click', '.btn-cancel', function() {
-        var commentId = $(this).data('comment-id');
-        cancelEdit(commentId);
-    });
-    
-    // 외부 클릭 시 메뉴 닫기
-    $(document).on('click', function(event) {
-        if (!$(event.target).closest('.comment-menu').length) {
-            $('.menu-dropdown').hide();
-        }
-    });
-    
-    // ESC 키로 수정 취소
-    $(document).on('keydown', '.edit-textarea', function(e) {
-        if (e.key === 'Escape') {
-            var commentId = $(this).attr('id').replace('edit-textarea-', '');
-            cancelEdit(commentId);
-        }
-    });
-    
-    // 텍스트 영역 입력 시 자동 높이 조절
-    $(document).on('input', '.edit-textarea', function() {
-        autoResizeTextarea($(this));
-    });
-    
-    // ============================================
-    // 전역 함수로 노출 (HTML onclick에서 사용 가능)
-    // ============================================
-    window.toggleMenu = toggleMenu;
-    window.editComment = editComment;
-    window.deleteComment = deleteComment;
-    
+/*$(document).ready(function() {
+	// 리뷰 작성 폼 초기화
+	initReviewForm();
 });
+*/
+/**
+ * 리뷰 작성 폼 이벤트 바인딩
+ */
+function initReviewForm() {
+	$('#reviewForm').on('submit', function(e) {
+		e.preventDefault(); // 기본 폼 제출 방지
+
+		// 입력값 가져오기
+		const movieCode = $('#movieCode').val();
+		const score = $('#reviewScore').val();
+		const content = $('#reviewContent').val().trim();
+
+		// 유효성 검사
+		if (!validateReview(score, content)) {
+			return false;
+		}
+
+		// 리뷰 제출
+		submitReview(movieCode, score, content);
+	});
+}
+
+/**
+ * 리뷰 유효성 검사
+ */
+function validateReview(score, content) {
+	// 평점 선택 확인
+	if (!score) {
+		alert('평점을 선택해주세요.');
+		$('#reviewScore').focus();
+		return false;
+	}
+
+	// 최소 글자 수 확인
+	if (content.length < 10) {
+		alert('관람평은 최소 10자 이상 작성해주세요.');
+		$('#reviewContent').focus();
+		return false;
+	}
+
+	// 최대 글자 수 확인
+	if (content.length > 500) {
+		alert('관람평은 최대 500자까지 작성 가능합니다.');
+		$('#reviewContent').focus();
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * 리뷰 제출 (AJAX)
+ */
+function submitReview(movieCode, score, content) {
+	// 제출 버튼 비활성화
+	const $submitBtn = $('#reviewForm button[type="submit"]');
+	const originalText = $submitBtn.html();
+	$submitBtn.prop('disabled', true).html('등록 중...');
+
+	// AJAX 요청
+	$.ajax({
+		url: '/prj2_movieWeb/user/movie/detail_review_write.jsp',
+		type: 'POST',
+		data: {
+			movieCode: movieCode,
+			score: score,
+			content: content
+		},
+		success: function(response) {
+			const result = response.trim();
+			//console.log(result);
+			if (result == 'true') {
+				alert('관람평이 등록되었습니다.');
+				// 폼 초기화
+				$('#reviewScore').val('');
+				$('#reviewContent').val('');
+
+				// 새 댓글을 목록에 추가 (새로고침 없이)
+				addNewReviewToList(score, content);
+				
+				// 버튼 복구
+				  $submitBtn.prop('disabled', false).html(originalText);
+			} else if (result == "noBook") {
+				alert('영화 시청하셔야 관람평을 작성하실 수 있습니다..');
+				$submitBtn.prop('disabled', false).html(originalText);
+			}
+
+
+			else {
+				alert('관람평 등록에 실패했습니다. 다시 시도해주세요.');
+				// 버튼 복구
+				$submitBtn.prop('disabled', false).html(originalText);
+			}
+		},
+		error: function(xhr, status, error) {
+			console.error('AJAX 오류:', error);
+			         console.error('상태:', status);
+			         console.error('응답:', xhr.responseText);
+			alert('오류가 발생했습니다. 다시 시도해주세요.');
+			// 버튼 복구
+			$submitBtn.prop('disabled', false).html(originalText);
+		}
+	});
+}
+
+/**
+ * 새로 작성한 댓글을 목록에 추가
+ */
+function addNewReviewToList(score, content) {
+    // 현재 날짜 생성
+    const today = new Date();
+    const dateStr = formatDate(today);
+    
+    // 세션에서 사용자 ID 가져오기
+    // JSP에서 window.currentUserId로 설정해야 함
+    const userId = window.currentUserId || '나';
+    
+    // HTML 이스케이프 (XSS 방지)
+    const safeContent = escapeHtml(content);
+    
+    // 새 댓글 HTML 생성
+    const newReviewHtml = `
+        <div class="comment-item new-review" style="display: none; animation: fadeIn 0.5s;">
+            <div class="comment-header">
+                <div class="comment-user">
+                    <div class="user-avatar">👤</div>
+                    <span class="username">${userId}</span>
+                </div>
+            </div>
+            <div class="comment-body">
+                <div class="comment-rating">
+                    <span class="rating-label">관람평</span>
+                    <span class="rating-stars">⭐ ${score}점</span>
+                </div>
+                <p class="comment-text">${safeContent}</p>
+                <span class="comment-time">${dateStr} (방금 전)</span>
+            </div>
+        </div>
+    `;
+    
+    // 빈 메시지가 있으면 제거
+    $('#emptyMessage').remove();
+    
+    // 댓글 목록 맨 위에 추가
+    $('#reviewListContainer').prepend(newReviewHtml);
+    
+    // 슬라이드 다운 애니메이션
+    $('.new-review').slideDown(500, function() {
+        $(this).removeClass('new-review');
+        // 하이라이트 효과 추가
+        $(this).css('background-color', '#fffacd');
+        setTimeout(() => {
+            $(this).animate({ backgroundColor: 'transparent' }, 1000);
+        }, 500);
+    });
+    
+    // 댓글 개수 업데이트
+    updateReviewCount();
+}
+
+/**
+ * 날짜 포맷팅 (YYYY-MM-DD)
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hour = String(date.getHours()).padStart(2, '0');
+    const min = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hour}-${min}`;
+}
+
+/**
+ * HTML 이스케이프 (XSS 방지)
+ */
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return String(text).replace(/[&<>"']/g, function(m) { 
+        return map[m]; 
+    });
+}
+
+/**
+ * 댓글 개수 업데이트
+ */
+function updateReviewCount() {
+    const $title = $('.comment-area .content-title');
+    if ($title.length > 0) {
+        const currentText = $title.text();
+        const match = currentText.match(/(\d+)개의 이야기/);
+        if (match) {
+            const currentCount = parseInt(match[1]);
+            const newCount = currentCount + 1;
+            const newText = currentText.replace(/(\d+)개의 이야기/, newCount + '개의 이야기');
+            $title.text(newText);
+        }
+    }
+}

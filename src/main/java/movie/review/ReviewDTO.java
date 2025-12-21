@@ -4,7 +4,18 @@ import java.sql.Date;
 
 //review_rvCode,review_content,review_score,review_date,book_code,users_id
 public class ReviewDTO {
+	public String getMovieCode() {
+		return movieCode;
+	}
+
+
+	public void setMovieCode(String movieCode) {
+		this.movieCode = movieCode;
+	}
+
+
 	private String rvCode, content, book_code, users_id, dateStr;
+	private String movieCode;
 	private Date date;
 	private int score;
 	
@@ -18,18 +29,23 @@ public class ReviewDTO {
 	@Override
 	public String toString() {
 		return "ReviewDTO [rvCode=" + rvCode + ", content=" + content + ", book_code=" + book_code + ", users_id="
-				+ users_id + ", dateStr=" + dateStr + ", date=" + date + ", score=" + score + "]";
+				+ users_id + ", dateStr=" + dateStr + ", movieCode=" + movieCode + ", date=" + date + ", score=" + score
+				+ "]";
 	}
 
 
-	public ReviewDTO(String rvCode, String content, String book_code, String users_id, String dateStr, Date date,
-			int score) {
+
+
+
+	public ReviewDTO(String rvCode, String content, String book_code, String users_id, String dateStr, String movieCode,
+			Date date, int score) {
 		super();
 		this.rvCode = rvCode;
 		this.content = content;
 		this.book_code = book_code;
 		this.users_id = users_id;
 		this.dateStr = dateStr;
+		this.movieCode = movieCode;
 		this.date = date;
 		this.score = score;
 	}

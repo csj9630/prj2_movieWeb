@@ -41,17 +41,33 @@ request.setCharacterEncoding("UTF-8");
 <script src="${commonURL}/resources/js/movie_detail.js"></script>
 <script src="${commonURL}/resources/js/movie_detail_review.js"></script>
 
+
 <script type="text/javascript">
+	//함수 정의는 movie_detail.js에 위치함.
+	$(document).ready(function() {
+		changeTab();//탭 기능
+		introDivider();//인트로 태그 적용
+		initImageModal();//이미지 확대
 
-//함수 정의는 movie_detail.js에 위치함.
-$(document).ready(function () {
-	changeTab();//탭 기능
-	introDivider();//인트로 태그 적용
-	initImageModal();//이미지 확대
-});//document.ready
+		initReviewForm();// 리뷰 작성 폼 초기화
+		submitLoginCheck();
+	});//document.ready
 
+	function submitLoginCheck() {
 
+		$("#btnSubmit").click(function() {
+			//로그인 체크
+			var userId = "${sessionScope.userId}";
+			console.log(userId);
+			if (!userId || userId === "" || userId === "null") {
+				alert("로그인 후 이용해주시기 바랍니다.");
+				
+	            event.preventDefault(); // submit 버튼 폼 제출 방지 
+	            return false;
+			}//if
+		})//click
 
+	}//submitLoginCheck
 </script>
 </head>
 <body>
@@ -112,11 +128,12 @@ $(document).ready(function () {
 					<div class="purchase-item">
 						<!--**************여기에 빠른 예매 경로 입력*****************  -->
 						<form id="reserve" name="reserve" class="purchase-item" action="">
-						<input type="button" value="예매" class="reservation"
-							onclick="location.href='${commonURL}/user/fast_booking/fastBooking.jsp';" />
-						<input type="hidden" value=" ${detail.code}" alt="영화코드">
-						<!-- 						onclick="location.href='index_temp.jsp';" />
- -->					</form>
+							<input type="button" value="예매" class="reservation"
+								onclick="location.href='${commonURL}/user/fast_booking/fastBooking.jsp';" />
+							<input type="hidden" value=" ${detail.code}" alt="영화코드">
+							<!-- 						onclick="location.href='index_temp.jsp';" />
+ -->
+						</form>
 					</div>
 				</div>
 			</div>
@@ -167,122 +184,144 @@ $(document).ready(function () {
 						</h2>
 					</div>
 
-					<!-- 공지 메시지 -->
+					<!-- ========================================== -->
+					<!-- 리뷰 작성 폼 -->
 					<div class="comment-notice">
 						<div class="comment-avatar">M</div>
 						<div style="flex: 1">
-							<input type="text" class="comment-input"
-								placeholder="최근 ${detail.name}에 관한 평점 게시물이 늘고 있습니다. 영화의 어떤 점이 좋았는지 이야기해주세요.
-							" />
-							<div style="text-align: right">
-								<a href="#" class="comment-button"> ✏️ 관람평쓰기 </a>
-							</div>
+							<form id="reviewForm">
+								<!-- 영화 코드 (hidden) -->
+								<input type="hidden" name="movieCode" id="movieCode"
+									value="${detail.code}" />
+
+								<!-- 평점 선택 -->
+								<div style="margin-bottom: 10px;">
+									<label style="font-weight: bold; margin-right: 10px;">평점:</label>
+									<select name="score" id="reviewScore" required
+										style="padding: 8px; border-radius: 4px; border: 1px solid #ddd;">
+										<option value="">선택하세요</option>
+										<option value="1">⭐ 1점</option>
+										<option value="2">⭐ 2점</option>
+										<option value="3">⭐ 3점</option>
+										<option value="4">⭐ 4점</option>
+										<option value="5">⭐ 5점</option>
+										<option value="6">⭐ 6점</option>
+										<option value="7">⭐ 7점</option>
+										<option value="8">⭐ 8점</option>
+										<option value="9">⭐ 9점</option>
+										<option value="10">⭐ 10점</option>
+									</select>
+								</div>
+
+								<!-- 리뷰 내용 -->
+								<textarea name="content" id="reviewContent"
+									class="comment-input"
+									placeholder="최근 ${detail.name}에 관한 평점 게시물이 늘고 있습니다. 영화의 어떤 점이 좋았는지 이야기해주세요."
+									required rows="3"
+									style="width: 100%; resize: vertical; min-height: 60px;"></textarea>
+
+								<!-- 제출 버튼 -->
+								<div style="text-align: right; margin-top: 10px;">
+									<button type="submit" class="comment-button" id="btnSubmit">✏️
+										관람평쓰기</button>
+								</div>
+							</form>
 						</div>
 					</div>
 
-					<!-- 댓글 목록 (기존 코드 유지) -->
-
-					<c:choose>
-						<c:when test="${empty reviewList}">
-							<div>
-								<h2 class="content-title">작성된 리뷰가 없습니다. 영화의 어떤 점이 좋았는지 제일
-									먼저 써주세요!</h2>
-							</div>
-						</c:when>
-						<c:otherwise>
-							<c:forEach var="review" items="${reviewList}" varStatus="i">
-								<div class="comment-item">
-									<div class="comment-header">
-										<div class="comment-user">
-											<div class="user-avatar">👤</div>
-											<span class="username">${review.users_id }</span>
-										</div>
-										<%-- <c:if test="${sessionScope.userId == comment.userId}"> --%>
-										<c:if test="${true}">
-										<div class="comment-actions">
-											<!-- <button class="comment-like">👍 0</button> -->
-											<button class="comment-menu">⋮</button>
-											<div id="menu-${comment.commentId}" class="menu-dropdown"
-												style="display: none;">
-												<button onclick="editComment(${comment.commentId})">수정</button>
-												<button onclick="deleteComment(${comment.commentId})">삭제</button>
+					<!-- 리뷰 목록 -->
+					<div id="reviewListContainer">
+						<c:choose>
+							<c:when test="${empty reviewList}">
+								<div id="emptyMessage">
+									<h2 class="content-title">작성된 리뷰가 없습니다. 영화의 어떤 점이 좋았는지 제일
+										먼저 써주세요!</h2>
+								</div>
+							</c:when>
+							<c:otherwise>
+								<c:forEach var="review" items="${reviewList}" varStatus="i">
+									<div class="comment-item">
+										<div class="comment-header">
+											<div class="comment-user">
+												<div class="user-avatar">👤</div>
+												<span class="username">${review.users_id}</span>
 											</div>
+
 										</div>
-										</c:if>
-									</div>
-									<div class="comment-body">
-										<div class="comment-rating">
-											<span class="rating-label">관람평</span> <span
-												class="rating-stars">⭐ +${review.score }</span>
+										<div class="comment-body">
+											<div class="comment-rating">
+												<span class="rating-label">관람평</span> <span
+													class="rating-stars">⭐ ${review.score}점</span>
+											</div>
+											<p class="comment-text">${review.content}</p>
+											<span class="comment-time">${review.dateStr}</span>
 										</div>
-										<p class="comment-text">${review.content }</p>
-										<span class="comment-time">${review.dateStr }</span>
 									</div>
-								</div>
-								<!-- 나머지 댓글들... -->
-							</c:forEach>
-						</c:otherwise>
-					</c:choose>
+								</c:forEach>
+							</c:otherwise>
+						</c:choose>
+					</div>
 				</div>
 			</div>
-		</div>
-
-		<!-- 예고편/스틸컷 탭 -->
 
 
-		<div class="tab-content" id="episodes">
-			<div class="content-box">
-				<div class="video-section">
-					<div class="video-header">
-						<h2 class="content-title">메인 예고편</h2>
+
+			<!-- 예고편/스틸컷 탭 -->
+
+
+			<div class="tab-content" id="episodes">
+				<div class="content-box">
+					<div class="video-section">
+						<div class="video-header">
+							<h2 class="content-title">메인 예고편</h2>
+						</div>
+
+						<div class="comments-section">
+							<!-- 메인 비디오 플레이어 -->
+							<iframe id="mainVideo" class="main-video"
+								src="${trailerList[0].fullVideoUrl}?controls=0"
+								title="${detail.name} 예고편" frameborder="0"
+								allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+								allowfullscreen> </iframe>
+
+							<!-- 비디오 썸네일 캐러셀 -->
+
+							<div class="video-carousel" id="videoCarousel">
+								<c:forEach var="trailer" items="${trailerList}"
+									varStatus="status">
+									<div class="video-thumbnail ${status.first ? 'active' : ''}"
+										onclick="changeVideo('${trailer.fullVideoUrl}', this)">
+										<img src="${trailer.fullThumbnailUrl}"
+											style="width: 100%; height: 100%; object-fit: cover"
+											alt="예고편 ${status.count}" />
+										<div class="play-icon">▶</div>
+									</div>
+								</c:forEach>
+							</div>
+						</div>
 					</div>
 
-					<div class="comments-section">
-						<!-- 메인 비디오 플레이어 -->
-						<iframe id="mainVideo" class="main-video"
-							src="${trailerList[0].fullVideoUrl}?controls=0"
-							title="${detail.name} 예고편" frameborder="0"
-							allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-							allowfullscreen> </iframe>
-
-						<!-- 비디오 썸네일 캐러셀 -->
-
-						<div class="video-carousel" id="videoCarousel">
-							<c:forEach var="trailer" items="${trailerList}"
-								varStatus="status">
-								<div class="video-thumbnail ${status.first ? 'active' : ''}"
-									onclick="changeVideo('${trailer.fullVideoUrl}', this)">
-									<img src="${trailer.fullThumbnailUrl}"
-										style="width: 100%; height: 100%; object-fit: cover"
-										alt="예고편 ${status.count}" />
-									<div class="play-icon">▶</div>
+					<!-- 이미지 앨범 -->
+					<div class="album-section">
+						<h2 class="content-title">이미지</h2>
+						<div class="image-grid">
+							<c:forEach var="img" items="${imgList}" varStatus="status">
+								<div class="image-item">
+									<img
+										src="${commonURL}/${movieImgPath}/${img.movie_code}/${img.img_path}"
+										alt="${detail.name} ${status.count}" />
 								</div>
 							</c:forEach>
 						</div>
 					</div>
 				</div>
-
-				<!-- 이미지 앨범 -->
-				<div class="album-section">
-					<h2 class="content-title">이미지</h2>
-					<div class="image-grid">
-						<c:forEach var="img" items="${imgList}" varStatus="status">
-							<div class="image-item">
-								<img
-									src="${commonURL}/${movieImgPath}/${img.movie_code}/${img.img_path}"
-									alt="${detail.name} ${status.count}" />
-							</div>
-						</c:forEach>
-					</div>
-				</div>
 			</div>
 		</div>
-	</div>
 
 
-	<footer id="footer">
-		<c:import url="${commonURL}/fragments/footer.jsp" />
-	</footer>
+		<footer id="footer">
+			<c:import url="${commonURL}/fragments/footer.jsp" />
+		</footer>
 </body>
 
 </html>
