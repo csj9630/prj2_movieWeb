@@ -7,6 +7,8 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>2GV 극장 정보</title>
     <jsp:include page="../../fragments/style_css.jsp" />
+    <!-- JQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <style>
       /* 초기화 및 기본 스타일 */
@@ -419,23 +421,17 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
             </div>
           </div>
           <div class="sub-title">
-            도봉역수소 · 서울특별시 서초구 서초대로 77길 3 (서초동) 아라타워 8층
+            서울 강남구 테헤란로70길 12 9층 2GV
           </div>
           <div style="margin-bottom: 40px">
-            <!-- 지도연결 주소 추가 -->
-            <a
-              href="#"
-              style="
-                display: inline-block;
-                background-color: #3e2675;
-                color: white;
-                padding: 10px 20px;
-                text-decoration: none;
-                border-radius: 4px;
-              "
-            >
-              길찾기
-            </a>
+            <!-- 지도 표시 영역 -->
+            <!-- box-sizing 초기화: 카카오맵 내부 요소 깨짐 방지 -->
+            <style>
+                #map * {
+                    box-sizing: content-box;
+                }
+            </style>
+            <div id="map" style="width:100%;height:400px; margin-bottom:20px;"></div>
           </div>
 
           <!-- 주차 섹션 -->
@@ -451,7 +447,7 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
 
           <div class="sub-title">주차안내</div>
           <ul class="floor-list" style="margin-bottom: 20px">
-            <li>아라타워 건물 P4 지하 3층 ~ 지하 6층 주차장 이용</li>
+            <li>쌍용타워 건물 P4 지하 3층 ~ 지하 6층 주차장 이용</li>
           </ul>
 
           <div class="sub-title">주차혜택</div>
@@ -506,7 +502,7 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
           <div class="sub-title">지하철</div>
           <ul class="floor-list">
             <li>
-              지하철 2호선, 신분당선 '강남역' → 지하철 9번 출구 직통 연결통로
+              지하철 신분당선 '선릉' → 지하철 9번 출구 직통 연결통로
               이용
             </li>
           </ul>
@@ -557,6 +553,10 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
     <!-- 푸터 -->
     <div id="footer"><jsp:include page="../../fragments/footer.jsp"/></div>
 
+     <!-- Kakao Maps SDK (services 라이브러리 포함) -->
+     <!-- Kakao Maps SDK (services 라이브러리 포함) -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fb2f53c00b8e64c485c6be56cd2f7710&libraries=services"></script>
+
     <script>
       // 탭 전환 기능
       const tabItems = document.querySelectorAll(".seater-tab-item");
@@ -574,8 +574,55 @@ pageEncoding="UTF-8"%> <%@ include file="../../fragments/siteProperty.jsp"%>
           // 해당하는 컨텐츠 표시
           const tabName = this.getAttribute("data-tab");
           document.getElementById(tabName + "-content").classList.add("active");
+          
+          // 교통안내 탭이 활성화되면 지도를 다시 그려 깨짐 방지 (Optional)
+          if(tabName === 'transport' && map) {
+              setTimeout(function(){ map.relayout(); map.setCenter(coords); }, 0);
+          }
         });
       });
+
+      // 지도 관련 전역 변수
+      var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+          mapOption = {
+              center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+              level: 3 // 지도의 확대 레벨
+          };  
+      
+      // 지도를 생성합니다
+      var map = new kakao.maps.Map(mapContainer, mapOption); 
+      var coords; // 좌표 저장을 위한 변수
+
+      // 주소-좌표 변환 객체를 생성합니다
+      var geocoder = new kakao.maps.services.Geocoder();
+
+      // 지도 로드 및 마커 표시 함수
+      function loadMap(address) {
+          // 주소로 좌표를 검색합니다
+          geocoder.addressSearch(address, function(result, status) {
+
+              // 정상적으로 검색이 완료됐으면 
+               if (status === kakao.maps.services.Status.OK) {
+
+                  coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                  // 결과값으로 받은 위치를 마커로 표시합니다
+                  var marker = new kakao.maps.Marker({
+                      map: map,
+                      position: coords
+                  });
+                  infowindow.open(marker);
+
+                  // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+                  map.setCenter(coords);
+              } 
+          });    
+      }
+
+      // 페이지 로드 시 지도를 띄웁니다.
+      // 정확한 좌표 검색을 위해 "9층"은 제외하고 검색합니다.
+      loadMap("서울 강남구 테헤란로70길 12");
+
     </script>
   </body>
 </html>
