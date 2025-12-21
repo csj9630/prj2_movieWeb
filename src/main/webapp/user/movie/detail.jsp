@@ -133,10 +133,8 @@ request.setCharacterEncoding("UTF-8");
 						<!--**************여기에 빠른 예매 경로 입력*****************  -->
 						<form id="reserve" name="reserve" class="purchase-item" action="">
 							<input type="button" value="예매" class="reservation"
-								onclick="location.href='${commonURL}/user/fast_booking/fastBooking.jsp';" />
+								onclick="location.href='${commonURL}/user/fast_booking/fastBooking.jsp?movieCode=${detail.code}';" />
 							<input type="hidden" value=" ${detail.code}" alt="영화코드">
-							<!-- 						onclick="location.href='index_temp.jsp';" />
- -->
 						</form>
 					</div>
 				</div>

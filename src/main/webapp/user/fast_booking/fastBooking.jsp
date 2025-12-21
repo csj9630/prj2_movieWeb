@@ -214,14 +214,45 @@ var selectedMovieName = null;
 
 var initMovieHtml = null;
 
+//상세페이지에서 예매 눌렀을 때 파라미터로 넘어온 영화코드를 선택되게 만들기
+function getMovieCodeByParam(){
+	const urlParams = new URLSearchParams(window.location.search);
+	const movieCode = urlParams.get('movieCode');
+	const date = urlParams.get('date');
+	if (movieCode || date) {
+		
+		//파라미터값에 해당되는 버튼의 클래스를 on으로 설정
+		var targetSelector = '#movieList .btn[movie-no="' + movieCode + '"]';
+		var targetSelector2 = '.date-list button[date-data="' + date + '"]';
+		$(targetSelector).addClass('on');
+		$(targetSelector2).addClass('on');
+		
+		//날짜,영화 변수에 파라미터값 저장
+		selectedMovieNo = movieCode;
+		selectedDate = date;
+		
+		//console.log("선택된 영화 코드:", movieCode);
+		//console.log("선택된 날짜 코드:", date);
+		
+		//시간표 로딩 함수 호출.
+		loadSchedule();
+		
+	}//end if
+}//getMovieCodeByParam
+
+
 
 //------------▶️▶️▶️▶️▶️▶️ 날짜 선택 + 영화 선택 => 시간표 출력 ----------------------------
 $(function() {
     initMovieHtml = $(".all-list").html();
+	
     
+	getMovieCodeByParam();//파라미터 영화코드/날짜를 자동 선택 및 시간표호출하기
+	
+	
     //현재 날짜 버튼 on인 곳의 날짜 정보를 저장함.
     selectedDate = $(".date-list .on ").attr("date-data");
-
+    
     
     // 날짜 클릭
     $(document).on("click", ".date-list button", function() {
