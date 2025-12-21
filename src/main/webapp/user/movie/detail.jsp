@@ -61,9 +61,9 @@ request.setCharacterEncoding("UTF-8");
 			console.log(userId);
 			if (!userId || userId === "" || userId === "null") {
 				alert("로그인 후 이용해주시기 바랍니다.");
-				
-	            event.preventDefault(); // submit 버튼 폼 제출 방지 
-	            return false;
+
+				event.preventDefault(); // submit 버튼 폼 제출 방지 
+				return false;
 			}//if
 		})//click
 
@@ -72,7 +72,7 @@ request.setCharacterEncoding("UTF-8");
 </head>
 <body>
 	<header id="header">
-		<c:import url="${commonURL}/fragments/header.jsp" />
+		<jsp:include page="../../fragments/header.jsp" />
 	</header>
 
 	<!-- 히어로 섹션 -->
@@ -317,11 +317,12 @@ request.setCharacterEncoding("UTF-8");
 				</div>
 			</div>
 		</div>
+	</div>
 
 
-		<footer id="footer">
-			<c:import url="${commonURL}/fragments/footer.jsp" />
-		</footer>
+	<footer id="footer">
+		<jsp:include page="../../fragments/header.jsp"/>
+	</footer>
 </body>
 
 </html>
