@@ -58,7 +58,7 @@ $(function(){
 
 
 
-		<header id="header" class="main-header no-bg">
+		<header id="header" class="main-header no-bg" style = "top: 0px;">
 			<jsp:include page="../../fragments/mainHeader.jsp" />
 		</header>
 

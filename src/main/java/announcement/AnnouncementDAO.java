@@ -92,10 +92,11 @@ public class AnnouncementDAO {
 			// 4. 쿼리문 생성 객체 얻기
 			StringBuilder selectBoard = new StringBuilder();
 			selectBoard
-			.append("	select	announce_num, announce_name, announce_date, announce_views				")
-			.append("	from	(	select	announce_num, announce_name, announce_date, announce_views,	")
-			.append("							row_number() over(order by announce_date desc) rnum		")
-			.append("	from		announce															");
+			.append("	select	announce_num, announce_name, announce_date, announce_views					")
+			.append("	from	(	select		announce_num, announce_name, announce_date, announce_views,	")
+			.append("							row_number() over(order by announce_num desc) rnum			")
+			.append("				from		announce													")
+			.append("				order by	announce_num desc											");
 
 			// dynamic query: 검색 키워드가 있다면 검색 키워드에 해당하는 글의 개수 검색
 			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {

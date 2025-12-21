@@ -194,7 +194,7 @@
 			<p class="tit-depth">회사소개</p>
 
 			<ul class="list-depth">
-				<li><a href="${commonURL}/user/companyIntro/companyIntro.jsp" title="회사소개">2GV
+				<li><a href="${commonURL}/user/companyIntro/companyIntro.jsp" title="2GV 소개">2GV
 						소개</a></li>
 			</ul>
 		</div>
@@ -211,8 +211,8 @@
 			<p class="tit-depth">안내</p>
 
 			<ul class="list-depth">
-				<li><a href="https://www.megabox.co.kr/specialtheater/list"
-					title="특별관">공지사항</a></li>
+				<li><a href="${commonURL}/user/announcement/announcementList.jsp"
+					title="공지사항">공지사항</a></li>
 			</ul>
 		</div>
 
@@ -220,7 +220,7 @@
 			<p class="tit-depth">극장</p>
 
 			<ul class="list-depth">
-				<li><a href="${commonURL}/user/movie_seaterInfo/movie-seaterInfo.jsp" title="진행중 이벤트">
+				<li><a href="${commonURL}/user/movie_seaterInfo/movie-seaterInfo.jsp" title="극장 정보">
 						극장 정보</a></li>
 			</ul>
 		</div>
@@ -229,10 +229,10 @@
 			<p class="tit-depth">예매</p>
 
 			<ul class="list-depth">
-				<li><a href="${commonURL}/user/fast_booking/fastBooking.jsp" title="새로운 상품">빠른
+				<li><a href="${commonURL}/user/fast_booking/fastBooking.jsp" title="빠른 예매">빠른
 						예매</a></li>
 				<li><a href="${commonURL}/user/dailyScreenSchedule/dailyScreenSchedule.jsp"
-					title="메가티켓">상영 시간표</a></li>
+					title="상영 시간표">상영 시간표</a></li>
 			</ul>
 		</div>
 		<div class="list position-6">
