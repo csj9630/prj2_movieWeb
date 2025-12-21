@@ -25,7 +25,7 @@ String bookNum = request.getParameter("bookNum");
 
 DecimalFormat df = new DecimalFormat("###,###");
 int totalBooking = Integer.parseInt(adultCnt) + Integer.parseInt(youthCnt) + Integer.parseInt(seniorCnt);
-int originPrice = totalBooking * 15000;
+int originPrice = totalBooking * 13000;
 int totalDiscount = Math.abs(originPrice - Integer.parseInt(totalPrice));
 
 String formattedTotalPrice = df.format(Integer.parseInt(totalPrice));

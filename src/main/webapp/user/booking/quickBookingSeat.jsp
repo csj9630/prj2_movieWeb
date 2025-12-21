@@ -58,7 +58,7 @@ if (openHour < 10) {
     discountType = "심야"; // 22시 이후
 }
 // 기본 티켓 가격 (할인 전 원가)
-int defaultTicketPrice = 15000;
+int defaultTicketPrice = 13000;
 
 //예약된 좌석들 이름(A1, A2형식)
 List<SeatBookDTO> reservedList = sbs.searchRestaurant(screenCode);

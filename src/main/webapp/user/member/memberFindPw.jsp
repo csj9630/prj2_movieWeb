@@ -470,10 +470,11 @@ let isCheckCode = false;
             }
 
             const emailVal = mailVal + '@' + domainVal;
-
+            const contextPath = "${pageContext.request.contextPath}";
+            console.log("값" + contextPath);
           //이메일 인증 번호 날릴 때 사용할 ajax.
             $.ajax({
-                url: '/prj2_movieWeb/quickMail', 
+            	url: contextPath + '/quickMail', 
                 type: 'POST',
                 data: {
                     email: emailVal 
