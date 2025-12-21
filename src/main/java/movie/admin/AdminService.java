@@ -3,6 +3,8 @@ package movie.admin;
 import java.sql.SQLException;
 import java.util.List;
 
+import kr.co.sist.chipher.DataDecryption;
+import kr.co.sist.chipher.DataEncryption;
 import movie.user_admin.UserDAO;
 import movie.user_admin.UserDTO;
 
@@ -71,6 +73,12 @@ public class AdminService {
 		UserDAO uDAO = UserDAO.getInstance();
 		try {
 			list = uDAO.selectUserList(startNum, endNum, field, keyword);
+			
+			//암호화된 유저 정보를 복호화.
+			for (UserDTO uDTO : list) {
+				uDTO = decryptUserData(uDTO);
+			}//end for
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -212,6 +220,68 @@ public class AdminService {
 		}
 		return result;
 	}
+	
+	//==========================================================================
+	
+	//유저 정보 복호화
+	public UserDTO decryptUserData(UserDTO uDTO) {
+		//String result = "";
+		
+		String key="a123456789012345";
+		if (uDTO != null) {
+			DataDecryption dd= new DataDecryption(key);//대칭키 : 암호화키와 복호화 키가 같아야 한다.
+			try {
+				uDTO.setUserName(dd.decrypt(uDTO.getUserName()));
+				uDTO.setPhoneNum(dd.decrypt(uDTO.getPhoneNum()));
+				uDTO.setEmail(dd.decrypt(uDTO.getEmail()));
+			} catch (IllegalArgumentException e) {
+	            // 로그를 남겨 어떤 데이터가 들어왔는지 확인하는 것이 중요합니다.
+	            System.err.println("복호화 실패: 유효하지 않은 Base64 문자열입니다 -> " + e.getMessage());
+	            return null; // 또는 빈 문자열, 혹은 사용자 정의 예외 던지기
+	       
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return uDTO;
+	}//decryptUserData
+	
+
+	/**
+	 * 유저 정보 암호화 - 유저 정보 수정 때 쓰려고 했으나 admin에서는 정보 수정 안한다고 하니 안 씀.
+	 * @param uDTO
+	 * @return
+	 */
+	public UserDTO encryptUserData(UserDTO uDTO) {
+		
+		String key="a123456789012345";
+		
+		DataEncryption de = new DataEncryption(key);
+		if (uDTO.getUserName() != null && !"".equals(uDTO.getUserName())) {
+			try {
+				uDTO.setUserName(de.encrypt(uDTO.getUserName()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end catch
+		} // end if
+		if (uDTO.getEmail() != null && !"".equals(uDTO.getEmail())) {
+			try {
+				uDTO.setEmail(de.encrypt(uDTO.getEmail()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end catch
+		} // end if
+		if (uDTO.getPhoneNum() != null && !"".equals(uDTO.getPhoneNum())) {
+			try {
+				uDTO.setPhoneNum(de.encrypt(uDTO.getEmail()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			} // end catch
+		} // end if
+		
+		return uDTO;
+	}//decryptUserData
 	
 	
 }
