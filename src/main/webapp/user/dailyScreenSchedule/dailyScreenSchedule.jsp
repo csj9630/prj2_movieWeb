@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', function() { // HTML이 다 로딩
 												    }
 													
 												    // 요일 한글 배열
-												    String[] dayNames = {"", "토", "일", "월", "화", "수", "목", "금"};
-												    String[] dayNamesEn = {"", "Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"};
+												    String[] dayNames = {"", "일", "월", "화", "수", "목", "금", "토"};
+												    String[] dayNamesEn = {"", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 													
 													// -----------------------------------------------------------
 												    // [설정] 버튼 하나의 너비 + 여백 (CSS와 맞춰야 합니다!)
