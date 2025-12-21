@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() { // HTML이 다 로딩
             
             // (추가 팁) 클릭한 날짜 값 확인하기
             const selectedDate = this.getAttribute('date-data');
-            console.log("선택한 날짜:", selectedDate); 
+            console.log("선택한 날짜:", selectedDate);
         });
     });
 });
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function() { // HTML이 다 로딩
 								                                    rpst-movie-no="<%= movieCode %>">
 								                                    <div class="td-ab">
 								                                        <div class="txt-center">
-								                                            <a href="/booking" title="영화예매하기">
+								                                            <a href="${commonURL}/user/fast_booking/fastBooking.jsp?movieCode=<%= movieCode %>&date=<%= selectedDate %>" title="영화예매하기">
 								                                                <div class="ico-box">
 								                                                    <i class="iconset ico-off"></i>
 								                                                </div>
