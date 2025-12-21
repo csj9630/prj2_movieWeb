@@ -217,8 +217,8 @@
 			var targetSelector2 = '.date-list button[date-data="' + date + '"]';
 			$(targetSelector).addClass('on');
 			$(targetSelector2).addClass('on');
-			console.log(selectedMovieNo);
-			console.log(selectedDate);
+			//console.log(selectedMovieNo);
+			//console.log(selectedDate);
 			
 			//기존 날짜,영화 변수에 값이 없으면 파라미터값 저장
 			if (!selectedMovieNo) {
@@ -279,7 +279,7 @@
 				$(this).addClass("on");
 				selectedMovieNo = $(this).attr("movie-no");
 				selectedMovieName = $(this).attr("movie-nm");
-				console.log("선택된 영화:", selectedMovieName);
+				//console.log("선택된 영화:", selectedMovieName);
 			}
 
 			// 시간표 조회 호출
@@ -529,7 +529,7 @@
 				date : selectedDate
 			};
 
-			console.log('선택된 스케줄:', scheduleData);
+			//console.log('선택된 스케줄:', scheduleData);
 
 			// 예매 페이지로 이동
 			//goReservation(scheduleData);
