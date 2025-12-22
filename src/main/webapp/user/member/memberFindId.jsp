@@ -378,20 +378,20 @@ body {
 				<div class="form-group">
 					<label class="form-label">이름</label> <input type="text"
 						class="form-input" id="users_name" name="users_name"
-						placeholder="이름 입력" value="으악">
+						placeholder="이름 입력" value="">
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">생년월일</label> <input type="date"
 						class="form-input" name="birth" id="birth"
 						placeholder="0000 - 00 - 00" max="9999-12-31" min="1900-01-01"
-						value="1995-05-13">
+						value="">
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">Email</label> <input type="text"
 						class="form-input" name="mail" id="mail" placeholder="example"
-						style="width: 50%;" value="으악">@ <select name="domain"
+						style="width: 50%;" value="">@ <select name="domain"
 						id="domain" class="form-input" style="width: 45%;">
 						<option value="gmail.com">gmail.com</option>
 						<option value="naver.com">naver.com</option>
@@ -403,7 +403,7 @@ body {
 				<div class="form-group">
 					<label class="form-label">휴대폰 번호</label> <input type="tel"
 						name="phone_num" id="phone_num" class="form-input"
-						placeholder="010-1234-5678" value="010-1234-5678">
+						placeholder="010-1234-5678" value="">
 				</div>
 				<input type="button" value="아이디 찾기" class="btn-submit"
 					id="btnFindId" />

@@ -250,11 +250,11 @@ function resultLogin() {
 
                 <form id="loginForm" name="loginForm" method="post" action="memberLoginProcess.jsp">
                     <div class="form-group">
-                        <input type="text" name="users_id" id="users_id" class="form-input" placeholder="아이디" title="아이디를 입력하세요" value="lee">
+                        <input type="text" name="users_id" id="users_id" class="form-input" placeholder="아이디" title="아이디를 입력하세요" value="">
                     </div>
 
                     <div class="form-group">
-                        <input type="password" name="users_pass" id="users_pass" class="form-input" placeholder="비밀번호" title="비밀번호를 입력하세요" value="12341234a">
+                        <input type="password" name="users_pass" id="users_pass" class="form-input" placeholder="비밀번호" title="비밀번호를 입력하세요" value="">
                     </div>
 					<input type="button" id="btnLogin" class="btn-submit" value="로그인">
                     <!-- <button type="button" id="btnLogin" class="btn-submit">로그인</button> -->

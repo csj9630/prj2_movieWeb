@@ -502,7 +502,7 @@ to {
 				<div class="form-group">
 					<label class="form-label">이름</label> <input type="text"
 						class="form-input" id="users_name" name="users_name"
-						placeholder="이름 입력" value="이정우">
+						placeholder="이름 입력" value="">
 				</div>
 
 				<div class="form-group">
@@ -521,14 +521,14 @@ to {
 					<label class="form-label">생년월일</label> <input type="date"
 						class="form-input" name="birth" id="birth"
 						placeholder="0000 - 00 - 00" max="9999-12-31" min="1900-01-01"
-						value="1995-05-13">
+						value="">
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">아이디</label>
 					<div class="users_id-group">
 						<input type="text" class="form-input" id="users_id"
-							placeholder="아이디 입력" name="users_id" value="lee"> <input
+							placeholder="아이디 입력" name="users_id" value=""> <input
 							type="button" class="btn-check" id="btnCheck" value="중복 확인" />
 					</div>
 					<div id="idCheckMsg"
@@ -540,7 +540,7 @@ to {
 					<div class="password-group">
 						<input type="password" name="users_pass" id="users_pass"
 							class="form-input" placeholder="영문, 숫자룰 포함한 8글자 이상"
-							value="12341234a">
+							value="">
 						<div class="password-icon">
 							<svg class="icon-show" xmlns="http://www.w3.org/2000/svg"
 								width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -564,7 +564,7 @@ to {
 					<div class="password-group">
 						<input type="password" class="form-input" id="checkPassword"
 							name="chkPassword" placeholder="영문, 숫자를 포함한 8글자 이상"
-							value="12341234a">
+							value="">
 						<div class="password-icon">
 							<svg class="icon-show" xmlns="http://www.w3.org/2000/svg"
 								width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -586,7 +586,7 @@ to {
 				<div class="form-group">
 					<label class="form-label">Email</label> <input type="text"
 						class="form-input" name="mail" id="mail" placeholder="example"
-						style="width: 50%;" value="leetest">@ <select
+						style="width: 50%;" value="">@ <select
 						name="domain" id="domain" class="form-input" style="width: 45%;">
 						<option value="gmail.com">gmail.com</option>
 						<option value="naver.com">naver.com</option>
@@ -598,7 +598,7 @@ to {
 				<div class="form-group">
 					<label class="form-label">휴대폰 번호</label> <input type="tel"
 						name="phone_num" id="phone_num" class="form-input"
-						placeholder="010-1234-5678" value="010-1111-2222">
+						placeholder="010-1234-5678" value="">
 				</div>
 
 				<div class="terms-group">

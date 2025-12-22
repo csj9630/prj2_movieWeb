@@ -731,7 +731,7 @@ let isCheckCode = false;
 					<label class="form-label">아이디</label>
 					<div class="users_id-group">
 						<input type="text" class="form-input" id="users_id"
-							placeholder="아이디 입력" name="users_id" value="lee">
+							placeholder="아이디 입력" name="users_id" value="">
 					</div>
 					<div id="idCheckMsg"
 						style="font-size: 13px; color: gray; margin-top: 5px;"></div>
@@ -740,14 +740,14 @@ let isCheckCode = false;
 				<div class="form-group">
 					<label class="form-label">이름</label> <input type="text"
 						class="form-input" id="users_name" name="users_name"
-						placeholder="이름 입력" value="이정우">
+						placeholder="이름 입력" value="">
 				</div>
 
 				<div class="form-group">
 					<label class="form-label">Email</label>
 					<div class="input-with-btn">
 						<input type="text" class="form-input" name="mail" id="mail"
-							placeholder="example" style="width: 50%;" value="1">@ <select
+							placeholder="example" style="width: 50%;" value="">@ <select
 							name="domain" id="domain" class="form-input" style="width: 45%;">
 							<option value="gmail.com">gmail.com</option>
 							<option value="naver.com">naver.com</option>
@@ -762,13 +762,13 @@ let isCheckCode = false;
 					<div class="auth-code-wrapper">
 						<div class="auth-box-container">
 							<input type="text" class="auth-box" maxlength="1" id="checkCode1"
-								value="1"> <input type="text" class="auth-box"
-								maxlength="1" id="checkCode2" value="1"> <input
+								value=""> <input type="text" class="auth-box"
+								maxlength="1" id="checkCode2" value=""> <input
 								type="text" class="auth-box" maxlength="1" id="checkCode3"
-								value="1"> <input type="text" class="auth-box"
-								maxlength="1" id="checkCode4" value="1"> <input
+								value=""> <input type="text" class="auth-box"
+								maxlength="1" id="checkCode4" value=""> <input
 								type="text" class="auth-box" maxlength="1" id="checkCode5"
-								value="1">
+								value="">
 						</div>
 						<button type="button" class="btn-small btn-dark"
 							id="authConfirmBtn">인증확인</button>
@@ -780,7 +780,7 @@ let isCheckCode = false;
 					<div class="password-group">
 						<input type="password" name="users_pass" id="users_pass"
 							class="form-input" placeholder="영문, 숫자룰 포함한 8글자 이상"
-							value="12341234a">
+							value="">
 						<div class="password-icon">
 							<svg class="icon-show" xmlns="http://www.w3.org/2000/svg"
 								width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -804,7 +804,7 @@ let isCheckCode = false;
 					<div class="password-group">
 						<input type="password" class="form-input" id="checkPassword"
 							name="chkPassword" placeholder="영문, 숫자를 포함한 8글자 이상"
-							value="12341234a">
+							value="">
 						<div class="password-icon">
 							<svg class="icon-show" xmlns="http://www.w3.org/2000/svg"
 								width="20" height="20" viewBox="0 0 24 24" fill="none"
