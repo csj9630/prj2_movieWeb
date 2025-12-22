@@ -11,7 +11,7 @@
 	boolean result = false;
 	if(seatCode != null) {
 		AdminTheaterService as = AdminTheaterService.getInstance();
-		result = as.modifySeatStatus(seatCode, nextStatus);
+		//result = as.modifySeatStatus(seatCode, nextStatus);
 	}
 	
 	JSONObject json = new JSONObject();

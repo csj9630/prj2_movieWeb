@@ -224,7 +224,7 @@ public class AdminService {
 	//==========================================================================
 	
 	//유저 정보 복호화
-	public UserDTO decryptUserData(UserDTO uDTO) {
+	public static UserDTO decryptUserData(UserDTO uDTO) {
 		//String result = "";
 		
 		String key="a123456789012345";

@@ -3,8 +3,10 @@ package movie.admin;
 import java.sql.SQLException;
 import java.util.List;
 
+import kr.co.sist.chipher.DataDecryption;
 import movie.reservation_admin.ReservationDAO;
 import movie.reservation_admin.ReservationDTO;
+import movie.user_admin.UserDTO;
 
 public class AdminReservationService {
 	private static AdminReservationService as;
@@ -20,10 +22,22 @@ public class AdminReservationService {
 	public List<ReservationDTO> getReservationList(int currentPage, int pageScale, String field, String keyword) {
 		int startNum = (currentPage - 1) * pageScale + 1;
 		int endNum = startNum + pageScale - 1;
-		
+		String key="a123456789012345";
+		String temp="";
 		List<ReservationDTO> list = null;
 		try {
 			list = ReservationDAO.getInstance().selectReservationList(startNum, endNum, field, keyword);
+			//ID 복호화
+			for (ReservationDTO rd : list) {
+				
+				//System.out.println(rd.getUserId());
+				temp= rd.getUserId();
+				if(temp != null || !temp.isEmpty()) {
+					rd.setUserId(decryptUserData(rd.getUserId()));
+					//System.out.println("===============");
+					//System.out.println(temp);
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -103,4 +117,25 @@ public class AdminReservationService {
 		}
 		return sb.toString();
 	}
+	
+	//유저 정보 복호화
+	public static String decryptUserData(String userId) {
+		String result = "";
+		String key="a123456789012345";
+		if (userId != null) {
+			DataDecryption dd= new DataDecryption(key);//대칭키 : 암호화키와 복호화 키가 같아야 한다.
+			try {
+				result = dd.decrypt(userId);
+			} catch (IllegalArgumentException e) {
+	            // 로그를 남겨 어떤 데이터가 들어왔는지 확인하는 것이 중요합니다.
+	            System.err.println("복호화 실패: 유효하지 않은 Base64 문자열입니다 -> " + e.getMessage());
+	            return userId; // 매개변수 그대로 넘기기.
+	       
+			}catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return result;
+	}//decryptUserData
 }
