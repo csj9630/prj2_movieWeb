@@ -262,7 +262,7 @@ function resultLogin() {
                     <div class="link-container">
                         <a href="memberFindId.jsp">ID 찾기</a>
                         <span class="divider">|</span>
-                        <a href="memberFindPw.jsp">PW 찾기</a>
+                        <a href="memberFindPw.jsp">PW 변경</a>
                         <span class="divider">|</span>
                         <a href="memberJoinFrm.jsp">회원가입</a>
                     </div>

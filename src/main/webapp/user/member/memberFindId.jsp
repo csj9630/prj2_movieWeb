@@ -313,12 +313,12 @@ body {
 
 	<div class="main-container-white">
 		<div class="wrapper">
-			<h1 class="title">아이디 / 비밀번호 찾기</h1>
+			<h1 class="title">아이디 / 비밀번호 변경</h1>
 
 			<div class="tab-container">
 				<a href="#" class="tab-item active">아이디 찾기</a> <a
 					href="${commonURL}/user/member/memberFindPw.jsp" class="tab-item">비밀번호
-					찾기</a>
+					변경</a>
 			</div>
 
 			<%-- <jsp:useBean id="uDTO" class="member.userDTO" scope="page" />
