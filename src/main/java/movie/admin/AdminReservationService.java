@@ -30,10 +30,9 @@ public class AdminReservationService {
 			//ID 복호화
 			for (ReservationDTO rd : list) {
 				
-				//System.out.println(rd.getUserId());
-				temp= rd.getUserId();
+				temp= rd.getUserName();
 				if(temp != null || !temp.isEmpty()) {
-					rd.setUserId(decryptUserData(rd.getUserId()));
+					rd.setUserName(decryptUserData(temp));
 					//System.out.println("===============");
 					//System.out.println(temp);
 				}
