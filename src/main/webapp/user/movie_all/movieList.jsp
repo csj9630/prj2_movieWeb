@@ -174,8 +174,9 @@ $(function() {
 				   		$("#movieList").append(appendMovie);
 						$("#currentPage").val(nextPage);
 						
-				
-						srhCnt++;//영화 show할 때마다 카운트, 4->8->10으로 나온다.		
+						if(srhCnt != <%=ms.totalBoxOffice()%>){
+						srhCnt++;//영화 show할 때마다 카운트, 4->8->10으로 나온다.
+						}
 				});//each
 				countMovie();countMovie();//카운트된 영화개수 출력
 				startRank += jsonArr.length;
