@@ -67,11 +67,11 @@ mrDTO.setContent(content);
 mrDTO.setUsers_id(userId);
 mrDTO.setBook_code(bookCode);
 
-System.out.println("프로세스 : " + mrDTO);
+//System.out.println("프로세스 : " + mrDTO);
 //DB 저장
 
 boolean flag = rs.addReview(mrDTO);
-System.out.println("jsp flag : "+flag);
+//System.out.println("jsp flag : "+flag);
 //결과 반환
 out.print(flag);
 
