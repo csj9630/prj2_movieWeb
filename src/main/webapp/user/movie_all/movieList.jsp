@@ -27,16 +27,44 @@
 }
 
 #movieList.searching li:nth-child(4n) ~ li {
-    margin-top: 0 !important;
+	margin-top: 0 !important;
 }
 </style>
+<%
+int currentPage = 1;
+int size = 4;
+
+MovieService ms = MovieService.getInstance();
+List<MovieDTO> list = ms.showPageMovie(currentPage, size);
+System.out.println(list);
+
+request.setAttribute("movies", list);
+request.setAttribute("currentPage", currentPage);
+request.setAttribute("size", size);
+%>
+
 
 <script type="text/javascript">
+var srhCnt=0;//검색된 영화 개수를 저장할 전역변수
+
+//검색된 영화 개수를 센다.
+//펼쳐보기의 영향으로 화면에 출력된 영화 갯수만 카운트 한다.
+function countMovie() {
+	console.log("검색 카운트 : "+srhCnt);
+	$("#totCnt").text(srhCnt);
+}
+
 $(function() {
 	/* 검색창 기능 
 	현재 관람평도 class명이 tit라서 관람평이라고 검색해도 모든 영화 출력되는 문제 발생
 	 */
 	//$("#btnSearch").click(searchMovie);
+
+	
+	//DB에서 검색된 영화 개수를 전역변수로 저장하고 출력.
+	srhCnt = <%=ms.totalBoxOffice()%>
+	countMovie();
+	
 	$("#ibxMovieNmSearch").keyup(searchMovie);
 
 	if ($("#ibxMovieNmSearch").val().trim().length > 0) {
@@ -49,6 +77,7 @@ $(function() {
 	})
 
 	function searchMovie() {
+		srhCnt=0; //검색수 카운트 전 초기화
 		var keyword = $("#ibxMovieNmSearch").val().toLowerCase().trim();
 		
 		if (keyword.length > 0) {
@@ -61,10 +90,13 @@ $(function() {
 			var title = $(this).find(".tit").text().toLowerCase();
 			if (title.includes(keyword)) {
 				$(this).show();
+				srhCnt++; //검색 영화 show할 때마다 카운트
 			} else {
 				$(this).hide();
 			}
+			countMovie();//카운트된 영화개수 출력
 		});
+
 	}
 
 	var startRank=5; //더보기 버튼을 눌렀을 때 순위를 위해서 전역변수로 선언
@@ -89,6 +121,7 @@ $(function() {
 			  	if(jsonArr.length<size) {
 			    	$("#btnAddMovie").hide();
 			    }
+			  	
 				/* ajax 요청이 성공해서 넘어올 데이터 */
 				$.each(jsonArr, (idx, obj) => {
 					var rank=idx+startRank;
@@ -140,11 +173,16 @@ $(function() {
 				        "</li>";
 				   		$("#movieList").append(appendMovie);
 						$("#currentPage").val(nextPage);
+						
+				
+						srhCnt++;//영화 show할 때마다 카운트, 4->8->10으로 나온다.		
 				});//each
+				countMovie();countMovie();//카운트된 영화개수 출력
 				startRank += jsonArr.length;
 			}//success
 		});//filterRelease
 	}
+	
 });
 
 </script>
@@ -181,30 +219,21 @@ $(function() {
 
 				<!-- movie-list-util -->
 				<div class="movie-list-util mt40">
-					<%
-					int currentPage = 1;
-					int size = 4;
 
-					MovieService ms = MovieService.getInstance();
-					List<MovieDTO> list = ms.showPageMovie(currentPage, size);
-					System.out.println(list);
-					
-					request.setAttribute("movies", list);
-					request.setAttribute("currentPage", currentPage);
-					request.setAttribute("size", size);
-					
-					%>
 					<!-- 검색결과 없을 때 -->
 					<!-- DB 적용시 count 함수로 찾아진 전체 영화 개수 -->
 					<p class="no-result-count">
-						<strong id="totCnt"><%=ms.totalBoxOffice()%></strong>개의 영화가
-						검색되었습니다.
+						<%-- 	<strong id="totCnt"><%=ms.totalBoxOffice()%></strong>개의 영화가  --%>
+						<%-- EL로 출력에서 자바스크립트에 저장하고 출력으로 변경.  --%>
+						<strong id="totCnt"></strong>개의 영화가 검색되었습니다.
 					</p>
+
 					<!--// 검색결과 없을 때 -->
 					<c:set var="searchText" value="${param.searchText}"></c:set>
 					<div class="movie-search">
 						<input type="text" title="영화명을 입력하세요" id="ibxMovieNmSearch"
-							name="ibxMovieNmSearch" placeholder="영화명 검색" class="input-text" value="${searchText}">
+							name="ibxMovieNmSearch" placeholder="영화명 검색" class="input-text"
+							value="${searchText}">
 						<button type="button" class="btn-search-input" id="btnSearch">검색</button>
 					</div>
 				</div>
@@ -234,29 +263,31 @@ $(function() {
 
 								<div class="movie-list-info">
 									<!-- 여기가 이제  -->
-									<a href="${commonURL}/user/movie/detail.jsp?code=${m.moviecode}"
-										class="wrap movieBtn" data-no="${m.moviecode}" title="${m.moviename} 상세보기">
+									<a
+										href="${commonURL}/user/movie/detail.jsp?code=${m.moviecode}"
+										class="wrap movieBtn" data-no="${m.moviecode}"
+										title="${m.moviename} 상세보기">
 										<p class="rank">
-											<c:out value="${i.index+1}"/><span class="ir">위</span>
-										</p>
-										<!-- 사진 경로 넣기 임시로 넣은 것 추후에 해당 영화에 맞는 영화로 변경 -->
-										<img
+											<c:out value="${i.index+1}" />
+											<span class="ir">위</span>
+										</p> <!-- 사진 경로 넣기 임시로 넣은 것 추후에 해당 영화에 맞는 영화로 변경 --> <img
 										src="${commonURL}/${movieImgPath}/${m.moviecode}/${m.moviemainimg}"
-										alt="${m.moviename}" class="poster lozad" onerror="noImg(this)">
+										alt="${m.moviename}" class="poster lozad"
+										onerror="noImg(this)">
 									</a>
 								</div>
 								<div class="tit-area">
-								<!-- age-all 이 부분을 수정해서 관람등급에 해당하는 영화로 변경 -->
+									<!-- age-all 이 부분을 수정해서 관람등급에 해당하는 영화로 변경 -->
 									<p class="movie-grade age-${m.moviegrade}"></p>
 									<p title="${m.moviename}" class="tit">${m.moviename}</p>
-								</div>
-								<!-- age-all 이 부분을 수정해서 관람등급에 해당하는 영화로 변경 -->
+								</div> <!-- age-all 이 부분을 수정해서 관람등급에 해당하는 영화로 변경 -->
 								<div class="rate-date">
-									<span class="rate">예매율 ${m.bookrate}%</span>
-									<span class="date">개봉일
-									<!-- 문자열 형태로 되어있는 날짜를 DATE 형으로 parse 진행 -->
-									<fmt:parseDate value="${m.moviereleasedate}" pattern="yyyy-MM-dd" var="releaseDate"/>
-        							<fmt:formatDate value="${releaseDate}" pattern="yyyy.MM.dd"/></span>
+									<span class="rate">예매율 ${m.bookrate}%</span> <span class="date">개봉일
+										<!-- 문자열 형태로 되어있는 날짜를 DATE 형으로 parse 진행 --> <fmt:parseDate
+											value="${m.moviereleasedate}" pattern="yyyy-MM-dd"
+											var="releaseDate" /> <fmt:formatDate value="${releaseDate}"
+											pattern="yyyy.MM.dd" />
+									</span>
 								</div>
 								<div class="btn-util">
 									<p class="txt movieStat1" style="display: none">상영예정</p>
@@ -265,8 +296,7 @@ $(function() {
 									<p class="txt movieStat6" style="display: none">상영종료</p>
 
 									<div class="case col-2 movieStat3">
-										<a
-											href="${commonURL}/user/fast_booking/fastBooking.jsp"
+										<a href="${commonURL}/user/fast_booking/fastBooking.jsp"
 											class="button purple bokdBtn" data-no="${m.moviecode}"
 											title="영화 예매하기"> 예매 </a>
 									</div>
