@@ -81,7 +81,7 @@ System.out.println("[DEBUG] mypage_review.jsp - ReviewList Size: " + (reviewList
 
         // 수정 폼으로 변경
         var editHtml = '<span class="review-badge">관람평</span>'
-                + '<input type="number" class="review-score-input" value="' + currentScore + '" min="0" max="100" />'
+                + '<input type="number" class="review-score-input" value="' + currentScore + '" min="1" max="10" />'
                 + '<span class="review-separator"></span>'
                 + '<div class="review-text-group" style="flex:1;">'
                 + '<div class="movie-title">'
@@ -104,6 +104,11 @@ System.out.println("[DEBUG] mypage_review.jsp - ReviewList Size: " + (reviewList
         var reviewNum = reviewItem.data("review-num");
         var newScore = reviewItem.find(".review-score-input").val();
         var newContent = reviewItem.find(".review-edit-input").val();
+
+        if (newScore < 1 || newScore > 10) {
+            alert("점수는 1점에서 10점 사이로 입력해주세요.");
+            return;
+        }
 
         // AJAX로 수정 요청
         $.ajax({
