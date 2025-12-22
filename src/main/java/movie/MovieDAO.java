@@ -340,7 +340,7 @@ public class MovieDAO {
 			.append(" FROM movie m ")
 			.append(" LEFT JOIN book_rate b ")
 			.append("   ON b.movie_code = m.movie_code ")
-			.append(" WHERE m.release_date < sysdate ")
+			.append(" WHERE m.release_date < sysdate AND  m.movie_delete ='F' ")
 			.append(" ORDER BY NVL(TO_NUMBER(b.book_rate), 0) DESC ")
 			.append(" OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 
@@ -399,7 +399,7 @@ public class MovieDAO {
 			.append("    FROM movie m ")
 			.append("    LEFT JOIN book_rate b ")
 			.append("        ON b.movie_code = m.movie_code ")
-			.append("    WHERE m.release_date > SYSDATE ")
+			.append("    WHERE m.release_date > SYSDATE AND  m.movie_delete ='F' ")
 			.append("    ORDER BY NVL(TO_NUMBER(b.book_rate), 0) DESC ")
 			.append("    OFFSET ? ROWS FETCH NEXT ? ROWS ONLY ");
 
